@@ -12,7 +12,6 @@ public class EncriptPass {
     public String encritpPass(String password) {
         String encreipted = Hashing.sha256()
                 .hashString(password, StandardCharsets.UTF_8).toString();
-
         return encreipted;
     }
 }

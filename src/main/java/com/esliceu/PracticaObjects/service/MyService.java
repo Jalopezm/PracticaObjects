@@ -6,9 +6,6 @@ import com.esliceu.PracticaObjects.utils.EncriptPass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import java.util.List;
-
 @Service
 public class MyService {
     @Autowired
@@ -23,7 +20,17 @@ public class MyService {
     }
 
 
-    public void logUser(String name, String password) {
+    public boolean logUser(String name, String password) {
         String encriptPassword = encriptPass.encritpPass(password);
+        return userDAO.logUser(name,encriptPassword);
+    }
+
+    public boolean validateUser(String name) {
+        return userDAO.validateUser(name);
+    }
+
+    public void deleteUser(String name, String password) {
+        String encriptPassword = encriptPass.encritpPass(password);
+        userDAO.deleteUser(name,encriptPassword);
     }
 }
