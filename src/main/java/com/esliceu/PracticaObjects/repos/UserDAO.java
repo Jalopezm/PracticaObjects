@@ -10,4 +10,6 @@ public interface UserDAO {
     boolean validateUser(String name);
 
     void deleteUser(String name, String password);
+
+    int getUserID(String name);
 }

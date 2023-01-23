@@ -5,6 +5,25 @@
     <title>Objects</title>
 </head>
 <body>
-<p th:text="'Hello,'+${user}+'!!'"></p>
+<h1 th:text="'Hello,'+${user}+'!!'"></h1>
+<h2>Your Objects</h2>
+<table th:if="${allObjects} != null">
+    <tr th:each="object:${allObjects}">
+        <td th:text="${object.id}"></td>
+    </tr>
+</table>
+<h2>Create New Bucket</h2>
+<form action="/objects/bucket" method="post">
+    <labe for="name">Name</labe>
+    <input type="text" name="name" id="name">
+    <input type="submit" value="Send">
+</form>
+<h2>Your Buckets</h2>
+<table th:if="${allBuckets} != null">
+    <tr th:each="buckets:${allBuckets}">
+        <td th:text="${buckets.uri}"></td>
+    </tr>
+</table>
+
 </body>
 </html>

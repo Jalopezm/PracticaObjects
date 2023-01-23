@@ -46,4 +46,10 @@ public class UserDAOImpl implements UserDAO {
     public void deleteUser(String name, String password) {
     jdbcTemplate.update("Delete from user where name = ? and password = ?", name, password);
     }
+
+    @Override
+    public int getUserID(String name) {
+        List<User> idList = jdbcTemplate.query("Select id from user where name = ?", new BeanPropertyRowMapper<>(User.class), name);
+        return idList.get(0).getId();
+    }
 }
