@@ -66,6 +66,8 @@ public class AppController {
 
     @GetMapping("/settings")
     public String settings(Model m) {
+        User user = (User) session.getAttribute("user");
+        m.addAttribute("user",user);
         m.getAttribute("user");
         return "settings";
     }
@@ -74,10 +76,11 @@ public class AppController {
         User user = (User) session.getAttribute("user");
         m.getAttribute("user");
         if (userForm.getPassword() == null || userForm.getPassword().equals("")){
-            myService.updateUser(userForm.getName(), user.getNickname(), userForm.getEmail(), user.getPassword());
+            myService.updateUser(userForm.getName(), userForm.getEmail(), user.getPassword(),user.getNickname());
         }else {
-            myService.updateUser(userForm.getName(), userForm.getNickname(), userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()));
+            myService.updateUser(userForm.getName(), userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()), userForm.getNickname());
         }
+        session.setAttribute("user",user);
         m.addAttribute("user",user);
         return "redirect:/settings";
     }

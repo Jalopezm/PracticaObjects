@@ -55,7 +55,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void updateUser(String name, String nickname, String email, String encritpPass) {
-        jdbcTemplate.update("UPDATE user SET name = ?, nickname = ? , email = ?, password = ?",name,nickname,email,encritpPass);
+        jdbcTemplate.update("UPDATE user SET name = ?, email = ?, password = ? where nickname = ",name,email,encritpPass,nickname);
 
     }
 
