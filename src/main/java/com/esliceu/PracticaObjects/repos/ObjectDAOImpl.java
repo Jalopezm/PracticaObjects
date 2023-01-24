@@ -19,4 +19,9 @@ public class ObjectDAOImpl implements ObjectDAO{
         return jdbcTemplate.query("Select * from object where userID= ?",new BeanPropertyRowMapper<>(Objects.class), id);
     }
 
+    @Override
+    public void newObject(String path, String fitxer) {
+        jdbcTemplate.update("Insert into object (uri,idOwner) values (?,?)", path,fitxer);
+    }
+
 }

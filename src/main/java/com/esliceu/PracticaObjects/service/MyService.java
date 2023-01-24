@@ -24,14 +24,14 @@ public class MyService {
     @Autowired
     BucketDAO bucketDAO;
 
-    public void newUser(String name, String password) {
-        User u = new User(name, password);
+    public void newUser(String name, String nick, String email, String password) {
+        User u = new User(name,nick,email, password);
         userDAO.addUser(u);
     }
 
 
-    public boolean logUser(String name, String password) {
-        return userDAO.logUser(name, password);
+    public boolean logUser(String nickname, String password) {
+        return userDAO.logUser(nickname, password);
     }
 
     public boolean validateUser(String name) {
@@ -42,19 +42,31 @@ public class MyService {
         userDAO.deleteUser(name, password);
     }
 
-    public int getUserID(String name) {
-        return userDAO.getUserID(name);
+    public int getUserID(String nickname) {
+        return userDAO.getUserID(nickname);
     }
     public List<Objects> allObjects(User user) {
-        return objectDAO.getAllObjects(getUserID(user.getName()));
+        return objectDAO.getAllObjects(getUserID(user.getNickname()));
     }
 
 
     public List<Bucket> allBuckets(User user) {
-        return bucketDAO.getAllBuckets(getUserID(user.getName()));
+        return bucketDAO.getAllBuckets(getUserID(user.getNickname()));
     }
 
     public void newBucket(String name, int idOwner) {
         bucketDAO.newBucket(name,idOwner);
+    }
+
+    public void newObject(String path, String fitxer) {
+        objectDAO.newObject(path,fitxer);
+    }
+
+    public void updateUser(String name, String nickname, String email, String encritpPass) {
+        userDAO.updateUser(name,nickname,email,encritpPass);
+    }
+
+    public User getUser(String nickname) {
+       return userDAO.getUser(nickname);
     }
 }

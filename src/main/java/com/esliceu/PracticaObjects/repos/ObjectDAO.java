@@ -8,4 +8,5 @@ import java.util.List;
 public interface ObjectDAO {
     List<Objects> getAllObjects(int id);
 
+    void newObject(String path, String fitxer);
 }

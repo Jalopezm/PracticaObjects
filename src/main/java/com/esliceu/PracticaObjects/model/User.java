@@ -3,12 +3,33 @@ package com.esliceu.PracticaObjects.model;
 public class User {
     int id;
     String name;
+    String nickname;
+    String email;
     String password;
 
-    public User(String name, String password) {
-        this.name= name;
+    public User(String name, String nick, String email, String password) {
+        this.name = name;
+        this.nickname = nick;
+        this.email = email;
         this.password = password;
     }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public User(){
 
     }

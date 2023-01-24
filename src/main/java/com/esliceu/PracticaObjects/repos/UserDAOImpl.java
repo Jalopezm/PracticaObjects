@@ -15,15 +15,15 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void addUser(User u) {
-        jdbcTemplate.update("Insert into user (name,password) values (?,?)", u.getName(), u.getPassword());
+        jdbcTemplate.update("Insert into user (name,nickname,email,password) values (?,?,?,?)", u.getName(),u.getNickname(),u.getEmail(), u.getPassword());
     }
 
     @Override
-    public boolean logUser(String name, String password) {
-        List<User> userList = jdbcTemplate.query("Select * from user where name = ? and password = ?", new BeanPropertyRowMapper<>(User.class), name, password);
+    public boolean logUser(String nickname, String password) {
+        List<User> userList = jdbcTemplate.query("Select * from user where nickname = ? and password = ?", new BeanPropertyRowMapper<>(User.class), nickname, password);
         for (int i = 0; i < userList.size(); i++) {
             User currUser = userList.get(i);
-            if (currUser.getName().equals(name) && currUser.getPassword().equals(password)) {
+            if (currUser.getNickname().equals(nickname) && currUser.getPassword().equals(password)) {
                 return true;
             }
         }
@@ -32,7 +32,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public boolean validateUser(String name) {
-        List<User> userList = jdbcTemplate.query("Select name from user where name = ? ", new BeanPropertyRowMapper<>(User.class), name);
+        List<User> userList = jdbcTemplate.query("Select nickname from user where nickname = ? ", new BeanPropertyRowMapper<>(User.class), name);
         for (int i = 0; i < userList.size(); i++) {
             User currUser = userList.get(i);
             if (currUser.getName().equals(name)) {
@@ -48,8 +48,20 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public int getUserID(String name) {
-        List<User> idList = jdbcTemplate.query("Select id from user where name = ?", new BeanPropertyRowMapper<>(User.class), name);
+    public int getUserID(String nickname) {
+        List<User> idList = jdbcTemplate.query("Select id from user where nickname = ?", new BeanPropertyRowMapper<>(User.class), nickname);
         return idList.get(0).getId();
+    }
+
+    @Override
+    public void updateUser(String name, String nickname, String email, String encritpPass) {
+        jdbcTemplate.update("UPDATE user SET name = ?, nickname = ? , email = ?, password = ?",name,nickname,email,encritpPass);
+
+    }
+
+    @Override
+    public User getUser(String nickname) {
+        List<User> userList = jdbcTemplate.query("Select * from user where nickname = ?", new BeanPropertyRowMapper<>(User.class), nickname);
+        return userList.get(0);
     }
 }

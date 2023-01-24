@@ -12,4 +12,8 @@ public interface UserDAO {
     void deleteUser(String name, String password);
 
     int getUserID(String name);
+
+    void updateUser(String name, String nickname, String email, String encritpPass);
+
+    User getUser(String nickname);
 }

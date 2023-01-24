@@ -34,12 +34,12 @@ public class AppController {
 
     @PostMapping("/signup")
     public String signUpPost(@Valid UserForm userForm, Model m) {
-        if (myService.validateUser(userForm.getName())) {
+        if (myService.validateUser(userForm.getNickname())) {
             m.addAttribute("message", "User Already Exists Select Other User Name");
             return "signup";
 
         } else {
-            myService.newUser(userForm.getName(), encriptPass.encritpPass(userForm.getPassword()));
+            myService.newUser(userForm.getName(),userForm.getNickname(),userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()));
             m.addAttribute("message", "OK");
         }
         return "index";
@@ -52,11 +52,11 @@ public class AppController {
 
     @PostMapping("/login")
     public String loginPost(@Valid UserForm userForm, Model m) {
-        if (myService.logUser(userForm.getName(), encriptPass.encritpPass(userForm.getPassword()))) {
-            User user = new User(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()));
+        if (myService.logUser(userForm.getNickname(), encriptPass.encritpPass(userForm.getPassword()))) {
+            User user = myService.getUser(userForm.getNickname());
             session.setAttribute("user",user);
             m.addAttribute("message", "OK");
-            m.addAttribute("user", userForm.getName());
+            m.addAttribute("userName", userForm.getNickname());
             return "redirect:/objects";
         } else {
             m.addAttribute("message", "Unknown User or Password");
@@ -64,10 +64,30 @@ public class AppController {
         return "login";
     }
 
-//    @GetMapping("/settings")
-//    public String settings() {
-//        return "settings";
-//    }
+    @GetMapping("/settings")
+    public String settings(Model m) {
+        m.getAttribute("user");
+        return "settings";
+    }
+    @PostMapping("/settings")
+    public String settingsPost(@Valid UserForm userForm, Model m) {
+        User user = (User) session.getAttribute("user");
+        m.getAttribute("user");
+        if (userForm.getPassword() == null || userForm.getPassword().equals("")){
+            myService.updateUser(userForm.getName(), user.getNickname(), userForm.getEmail(), user.getPassword());
+        }else {
+            myService.updateUser(userForm.getName(), userForm.getNickname(), userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()));
+        }
+        m.addAttribute("user",user);
+        return "redirect:/settings";
+    }
+
+
+
+
+
+
+
 //    @GetMapping("/settings/{deleteUser}")
 //    public String deleteUserGet(@Valid UserForm userForm,Model m){
 //        return "deleteUser";
