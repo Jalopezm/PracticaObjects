@@ -31,7 +31,7 @@
 <h2>Your Buckets</h2>
 <table th:if="${allBuckets} != null">
     <tr th:each="buckets:${allBuckets}">
-        <td th:text="${buckets.uri}"></td>
+        <td th:text="<a href=/objects/${buckets.uri}>${buckets.uri}</a>"></td>
     </tr>
 </table>
 

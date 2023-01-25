@@ -1,44 +1,75 @@
 package com.esliceu.PracticaObjects.model;
 
+import java.sql.Timestamp;
+import java.util.Map;
+
 public class Objects {
     int id;
-    String name;
-    int userId;
-    String bucketName;
-    String date;
+    String uri;
+    String owner;
+    int bucketId;
+    Timestamp lastModified;
+    Timestamp created;
+    String contentType;
+    //Map<String,String> metaData;
 
     public Objects() {
     }
 
-    public String getName() {
-        return name;
+    public int getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getUri() {
+        return uri;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
-    public String getBucketName() {
-        return bucketName;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    public String getDate() {
-        return date;
+    public int getBucketId() {
+        return bucketId;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setBucketId(int bucketId) {
+        this.bucketId = bucketId;
+    }
+
+    public Timestamp getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Timestamp lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public Timestamp getCreated() {
+        return created;
+    }
+
+    public void setCreated(Timestamp created) {
+        this.created = created;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }
+

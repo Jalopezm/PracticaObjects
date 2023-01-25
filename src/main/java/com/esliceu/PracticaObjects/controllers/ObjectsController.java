@@ -9,6 +9,10 @@ import com.esliceu.PracticaObjects.service.MyService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,8 +59,19 @@ public class ObjectsController {
         User user = (User) session.getAttribute("user");
         bucketForm.setIdOwner(myService.getUserID(user.getNickname()));
         myService.newBucket(bucketForm.getName(), bucketForm.getIdOwner());
-        myService.newObject(objectForm.getPath(),objectForm.getFitxer());
         m.addAttribute("message", "Bucket Created");
+        myService.newObject(objectForm.getPath(),objectForm.getFitxer());
         return "objects";
     }
+
+//    @GetMapping("")
+//    public ResponseEntity<byte[]> download(){
+//        byte[] content = file.getContent();
+//        String name = object.getName();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentLength(content.length);
+//        headers.setContentType(MediaType.valueOf(""));
+//        headers.set("Content-disposition","attachment ;filename = "+ name);
+//        return new ResponseEntity<>(content,headers, HttpStatus.OK);
+//    }
 }

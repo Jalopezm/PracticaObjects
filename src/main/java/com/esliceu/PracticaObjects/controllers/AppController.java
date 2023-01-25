@@ -75,7 +75,7 @@ public class AppController {
     public String settingsPost(@Valid UserForm userForm, Model m) {
         User user = (User) session.getAttribute("user");
         m.getAttribute("user");
-        if (userForm.getPassword() == null || userForm.getPassword().equals("")){
+        if (userForm.getPassword().length() < 8){
             myService.updateUser(userForm.getName(), userForm.getEmail(), user.getPassword(),user.getNickname());
         }else {
             myService.updateUser(userForm.getName(), userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()), userForm.getNickname());
