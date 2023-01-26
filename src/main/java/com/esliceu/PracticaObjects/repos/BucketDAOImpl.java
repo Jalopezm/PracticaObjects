@@ -14,11 +14,17 @@ public class BucketDAOImpl implements BucketDAO{
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public void newBucket(String name, int idOwner) {
-        jdbcTemplate.update("Insert into bucket (uri,idOwner) values (?,?)", name,idOwner);
+    public void newBucket(String name, String Owner) {
+        jdbcTemplate.update("Insert into bucket (uri,owner) values (?,?)", name,Owner);
     }
     @Override
-    public List<Bucket> getAllBuckets(int id) {
-        return jdbcTemplate.query("Select * from bucket where idOwner=?",new BeanPropertyRowMapper<>(Bucket.class), id);
+    public List<Bucket> getAllBuckets(String nickname) {
+        return jdbcTemplate.query("Select * from bucket where owner=?",new BeanPropertyRowMapper<>(Bucket.class), nickname);
+    }
+
+    @Override
+    public Bucket getBucket(String uri, String owner) {
+        List<Bucket> bucketList = jdbcTemplate.query("Select * from bucket where owner=? and uri = ?",new BeanPropertyRowMapper<>(Bucket.class), owner,uri);
+        return bucketList.get(0);
     }
 }

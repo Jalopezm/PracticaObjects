@@ -4,6 +4,15 @@ public class File {
     int id;
     byte[] body;
     int contentLength;
+    String hash;
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
 
     public int getId() {
         return id;

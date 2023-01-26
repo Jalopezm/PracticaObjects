@@ -3,13 +3,13 @@ package com.esliceu.PracticaObjects.model;
 public class Bucket {
     int id;
     String uri;
-    int idOwner;
+    String Owner;
     String metaData;
 
-    public Bucket(int id, String uri, int idOwner) {
+    public Bucket(int id, String uri, String Owner) {
         this.id = id;
         this.uri = uri;
-        this.idOwner = idOwner;
+        this.Owner = Owner;
     }
 
     public Bucket() {
@@ -31,11 +31,11 @@ public class Bucket {
         this.uri = uri;
     }
 
-    public int getIdOwner() {
-        return idOwner;
+    public String getOwner() {
+        return Owner;
     }
 
-    public void setIdOwner(int idOwner) {
-        this.idOwner = idOwner;
+    public void setOwner(String owner) {
+        Owner = owner;
     }
 }

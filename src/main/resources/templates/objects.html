@@ -12,26 +12,26 @@
 <h2>Your Objects</h2>
 <table th:if="${allObjects} != null">
     <tr th:each="object:${allObjects}">
-        <td th:text="${object.id}"></td>
+        <td><a th:href="@{/objects{uri} (uri=${object.uri})}" th:text="${object.uri}"></a></td>
     </tr>
 </table>
 <h2>Create New Object</h2>
-<form action="/objects/bucket" method="post" enctype="multipart/form-data">
+<form th:action ="@{/objects/{bucketName}(bucketName=${bucketName})}" method="post" enctype="multipart/form-data">
     <label for="path">Path</label>
     <input type="text" name="path" id="path">
     <input type="file" name="file" id="file">
     <input type="submit" value="Send">
 </form>
 <h2>Create New Bucket</h2>
-<form action="/objects/bucket" method="post">
-    <label for="name">Name</label>
-    <input type="text" name="name" id="name">
+<form action="/objects" method="post">
+    <label for="uri">uri</label>
+    <input type="text" name="uri" id="uri">
     <input type="submit" value="Send">
 </form>
 <h2>Your Buckets</h2>
 <table th:if="${allBuckets} != null">
     <tr th:each="buckets:${allBuckets}">
-        <td th:text="<a href=/objects/${buckets.uri}>${buckets.uri}</a>"></td>
+        <td><a th:href="@{/objects/{uri} (uri=${buckets.uri})}" th:text="${buckets.uri}"></a></td>
     </tr>
 </table>
 

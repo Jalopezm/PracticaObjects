@@ -33,11 +33,8 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public boolean validateUser(String name) {
         List<User> userList = jdbcTemplate.query("Select nickname from user where nickname = ? ", new BeanPropertyRowMapper<>(User.class), name);
-        for (int i = 0; i < userList.size(); i++) {
-            User currUser = userList.get(i);
-            if (currUser.getName().equals(name)) {
-                return true;
-            }
+        if (userList.size() > 0){
+            return true;
         }
         return false;
     }

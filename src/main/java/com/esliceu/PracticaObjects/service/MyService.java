@@ -7,10 +7,10 @@ import com.esliceu.PracticaObjects.repos.BucketDAO;
 import com.esliceu.PracticaObjects.repos.ObjectDAO;
 import com.esliceu.PracticaObjects.repos.UserDAO;
 import com.esliceu.PracticaObjects.utils.EncriptPass;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -46,20 +46,16 @@ public class MyService {
         return userDAO.getUserID(nickname);
     }
     public List<Objects> allObjects(User user) {
-        return objectDAO.getAllObjects(getUserID(user.getNickname()));
+        return objectDAO.getAllObjects(user.getNickname());
     }
 
 
     public List<Bucket> allBuckets(User user) {
-        return bucketDAO.getAllBuckets(getUserID(user.getNickname()));
+        return bucketDAO.getAllBuckets(user.getNickname());
     }
 
-    public void newBucket(String name, int idOwner) {
-        bucketDAO.newBucket(name,idOwner);
-    }
-
-    public void newObject(String path, String fitxer) {
-        objectDAO.newObject(path,fitxer);
+    public void newBucket(String name, String Owner) {
+       bucketDAO.newBucket(name,Owner);
     }
 
     public void updateUser(String name, String nickname, String email, String encritpPass) {
@@ -68,5 +64,21 @@ public class MyService {
 
     public User getUser(String nickname) {
        return userDAO.getUser(nickname);
+    }
+
+    public void newFile(byte[] arrayBytes, int length, String hash) {
+        objectDAO.newFile(arrayBytes,length,hash);
+    }
+
+    public Bucket getBucket(String uri, String owner) {
+        return bucketDAO.getBucket(uri,owner);
+    }
+
+    public void newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
+        objectDAO.newObject(bucketId,uri,from,owner,from1,contentType);
+    }
+
+    public boolean fileOnDb(String hash) {
+        return objectDAO.fileOnDb(hash);
     }
 }
