@@ -76,7 +76,7 @@ public class ObjectsController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String hash = encriptPass.encritpPass(String.valueOf(arrayBytes));
+        String hash = String.valueOf(arrayBytes.hashCode());
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
             String uri = objectForm.getPath() + file.getOriginalFilename();
