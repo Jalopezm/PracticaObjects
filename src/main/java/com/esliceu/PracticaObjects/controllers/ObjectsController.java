@@ -22,9 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -60,16 +63,30 @@ public class ObjectsController {
         User user = (User) session.getAttribute("user");
         m.addAttribute("bucketName", bucketName);
         m.addAttribute("userName", user.getNickname());
-        Bucket bucket = myService.getBucket(bucketName, user.getNickname());
-        session.setAttribute("bucket", bucket);
-        List<Objects> objectsList = myService.allObjects(user,bucket);
-        m.addAttribute("allObjects", objectsList);
+        if (bucketName != "") {
+            Bucket bucket = myService.getBucket(bucketName, user.getNickname());
+            session.setAttribute("bucket", bucket);
+            session.setAttribute("bucketName", bucketName);
+            List<Objects> objectsList = myService.allObjects(user, bucket);
+            m.addAttribute("allObjects", objectsList);
+            List<String> objectUris = new ArrayList<>();
+            for (Objects o : objectsList) {
+                String uri = (String) o.getUri().split("/")[1];
+                if (!uri.contains(".")) {
+                    uri = "/" + uri + "/";
+                }else{
+                    uri = "/" +uri;
+                }
+                objectUris.add(uri);
 
+            }
+            m.addAttribute("allUris", objectUris);
+        }
         return "objects";
     }
 
-    @PostMapping("/objects/{bucket}")
-    public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file, Model m) {
+    @PostMapping("/objects/{bucketName}")
+    public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file) {
         byte[] arrayBytes = null;
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         try {
@@ -79,37 +96,41 @@ public class ObjectsController {
         }
         String hash = String.valueOf(Arrays.hashCode(arrayBytes));
         File createdFile = null;
+
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
         }
-
         createdFile = myService.getFile(hash);
-        createdFile.setVersion(createdFile.getVersion()+1);
-
+        createdFile.setVersion(createdFile.getVersion() + 1);
         String uri = objectForm.getPath() + file.getOriginalFilename();
         Objects object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
-        myService.refFileToObject(object,createdFile);
+        myService.refFileToObject(object, createdFile);
         return "redirect:" + bucket.getUri();
     }
-    @GetMapping("/objects/{bucket}/**")
-    public String getobject(HttpServletRequest req, Model model) {
+
+    @GetMapping("/objects/{bucketName}/**")
+    public String getobject(HttpServletRequest req, Model m) {
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         String s = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String[] sArr = (s.split("/"));
 
-        String objectname = sArr[sArr .length];
+        String[] objectname = new String[]{s.split("/objects")[1]};
+        String objectName = objectname[0];
+        objectName = objectName.replace("%20", " ");
         // Detectar si és un directori o un objecte. Els directoris sempre acaben en "/"
 
         if (s.endsWith("/")) {
             // directori
+            User user = (User) session.getAttribute("user");
+            List<Objects> objectsList = myService.allObjects(user, bucket);
+            m.addAttribute("allObjects", objectsList);
             System.out.println("Directori");
+            return "folder";
         } else {
             // objecte
-            Objects o = myService.getObject(bucket.getId(), objectname);
-            model.addAttribute("object", o);
+            Objects o = myService.getObject(bucket.getId(), objectName);
+            m.addAttribute("object", o);
             return "oneobject";
         }
-        return "object";
     }
 //    @GetMapping("")
 //    public ResponseEntity<byte[]> download(){

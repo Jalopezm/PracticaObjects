@@ -45,7 +45,9 @@ public class ObjectDAOImpl implements ObjectDAO{
 
     @Override
     public Objects getObject(int bucketId, String objectname) {
-        return (Objects) jdbcTemplate.query("Select * from file where bucketId = ? and uri = ?",new BeanPropertyRowMapper<>(Objects.class),bucketId,objectname);
+        List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId = ? and uri = ?",new BeanPropertyRowMapper<>(Objects.class),bucketId,objectname);
+        Objects object = objectsList.get(0);
+        return object;
     }
 
     @Override

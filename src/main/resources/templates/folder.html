@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table th:if="${allObjects} != null">
+    <tr th:each="objects:${allObjects}">
+        <td><a th:href="@{/objects{uri} (uri=${objects.uri})}" th:text="${objects.uri}"></a></td>
+    </tr>
+</table>
+</body>
+</html>

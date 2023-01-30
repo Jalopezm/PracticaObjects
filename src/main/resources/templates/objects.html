@@ -7,8 +7,8 @@
 <body>
 <h2>Your Objects</h2>
 <table th:if="${allObjects} != null">
-  <tr th:each="object:${allObjects}">
-    <td><a th:href="@{/objects{uri} (uri=${object.uri})}" th:text="${object.uri}"></a></td>
+  <tr th:each="uri:${allUris}">
+    <td><a th:href="@{/objects{uri} (uri=${uri})}" th:text="${uri}"></a></td>
   </tr>
 </table>
 <h2>Create New Object</h2>
