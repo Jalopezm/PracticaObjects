@@ -16,8 +16,8 @@ public class ObjectDAOImpl implements ObjectDAO{
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Objects> getAllObjects(String nickname) {
-        return jdbcTemplate.query("Select * from object where owner= ?",new BeanPropertyRowMapper<>(Objects.class), nickname);
+    public List<Objects> getAllObjects(String nickname,int bucketId) {
+        return jdbcTemplate.query("Select * from object where owner= ? and bucketId=?",new BeanPropertyRowMapper<>(Objects.class), nickname,bucketId);
     }
 
     @Override
@@ -27,8 +27,11 @@ public class ObjectDAOImpl implements ObjectDAO{
 
 
     @Override
-    public void newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
+    public Objects newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
         jdbcTemplate.update("Insert into object (bucketId,uri,lastModified,owner,created,contentType) values (?,?,?,?,?,?)" ,bucketId,uri,from,owner,from1,contentType);
+        List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId=?",new BeanPropertyRowMapper<>(Objects.class),bucketId);
+        Objects object = objectsList.get(objectsList.size()-1);
+        return object;
     }
 
     @Override
@@ -38,6 +41,24 @@ public class ObjectDAOImpl implements ObjectDAO{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Objects getObject(int bucketId, String objectname) {
+        return (Objects) jdbcTemplate.query("Select * from file where bucketId = ? and uri = ?",new BeanPropertyRowMapper<>(Objects.class),bucketId,objectname);
+    }
+
+    @Override
+    public File getFile(String hash) {
+        List<File> fileList = jdbcTemplate.query("Select * from file where hash=?",new BeanPropertyRowMapper<>(File.class),hash);
+        File file = fileList.get(0);
+        return file;
+    }
+
+    @Override
+    public void refFileToObject(Objects object, File file) {
+        jdbcTemplate.update("Insert into filetoobject (idObject,idFile,date,versionId) values (?,?,?,?)" ,object.getId(),file.getId(),object.getCreated(),file.getVersion());
+
     }
 
 

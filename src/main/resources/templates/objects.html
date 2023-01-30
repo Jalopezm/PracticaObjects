@@ -2,38 +2,21 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Objects</title>
+    <title>Title</title>
 </head>
 <body>
-<nav>
-    <a href="/settings"> Settings</a>
-</nav>
-<h1 th:text="'Hello,'+${userName}+'!!'"></h1>
 <h2>Your Objects</h2>
 <table th:if="${allObjects} != null">
-    <tr th:each="object:${allObjects}">
-        <td><a th:href="@{/objects{uri} (uri=${object.uri})}" th:text="${object.uri}"></a></td>
-    </tr>
+  <tr th:each="object:${allObjects}">
+    <td><a th:href="@{/objects{uri} (uri=${object.uri})}" th:text="${object.uri}"></a></td>
+  </tr>
 </table>
 <h2>Create New Object</h2>
 <form th:action ="@{/objects/{bucketName}(bucketName=${bucketName})}" method="post" enctype="multipart/form-data">
-    <label for="path">Path</label>
-    <input type="text" name="path" id="path">
-    <input type="file" name="file" id="file">
-    <input type="submit" value="Send">
+  <label for="path">Path</label>
+  <input type="text" name="path" id="path" th:value="'/'">
+  <input type="file" name="file" id="file">
+  <input type="submit" value="Send">
 </form>
-<h2>Create New Bucket</h2>
-<form action="/objects" method="post">
-    <label for="uri">uri</label>
-    <input type="text" name="uri" id="uri">
-    <input type="submit" value="Send">
-</form>
-<h2>Your Buckets</h2>
-<table th:if="${allBuckets} != null">
-    <tr th:each="buckets:${allBuckets}">
-        <td><a th:href="@{/objects/{uri} (uri=${buckets.uri})}" th:text="${buckets.uri}"></a></td>
-    </tr>
-</table>
-
 </body>
 </html>

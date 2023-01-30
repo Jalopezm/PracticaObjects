@@ -5,6 +5,15 @@ public class File {
     byte[] body;
     int contentLength;
     String hash;
+    int version;
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getVersion() {
+        return version;
+    }
 
     public String getHash() {
         return hash;

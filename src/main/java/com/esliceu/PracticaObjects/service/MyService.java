@@ -1,6 +1,7 @@
 package com.esliceu.PracticaObjects.service;
 
 import com.esliceu.PracticaObjects.model.Bucket;
+import com.esliceu.PracticaObjects.model.File;
 import com.esliceu.PracticaObjects.model.Objects;
 import com.esliceu.PracticaObjects.model.User;
 import com.esliceu.PracticaObjects.repos.BucketDAO;
@@ -45,8 +46,8 @@ public class MyService {
     public int getUserID(String nickname) {
         return userDAO.getUserID(nickname);
     }
-    public List<Objects> allObjects(User user) {
-        return objectDAO.getAllObjects(user.getNickname());
+    public List<Objects> allObjects(User user, Bucket bucket) {
+        return objectDAO.getAllObjects(user.getNickname(), bucket.getId());
     }
 
 
@@ -74,11 +75,23 @@ public class MyService {
         return bucketDAO.getBucket(uri,owner);
     }
 
-    public void newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
-        objectDAO.newObject(bucketId,uri,from,owner,from1,contentType);
+    public Objects newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
+        return objectDAO.newObject(bucketId,uri,from,owner,from1,contentType);
     }
 
     public boolean fileOnDb(String hash) {
         return objectDAO.fileOnDb(hash);
+    }
+
+    public Objects getObject(int bucketId, String objectname) {
+        return objectDAO.getObject(bucketId,objectname);
+    }
+
+    public File getFile(String hash) {
+        return objectDAO.getFile(hash);
+    }
+
+    public void refFileToObject(Objects object, File file) {
+        objectDAO.refFileToObject(object,file);
     }
 }
