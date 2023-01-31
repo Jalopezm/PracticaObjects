@@ -7,7 +7,7 @@
 <body>
 <table th:if="${allObjects} != null">
     <tr th:each="uri:${allUris}">
-        <td><a th:href="@{/objects{uri} (uri=${uri})}" th:text="${uri}"></a></td>
+        <td><a th:href="@{{bucket}{uri} (uri=${uri}, bucket=${bucketName})}" th:text="${uri}"></a></td>
     </tr>
 </table>
 </body>

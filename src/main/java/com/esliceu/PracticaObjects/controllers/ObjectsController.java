@@ -22,12 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -77,7 +75,9 @@ public class ObjectsController {
                 }else{
                     uri = "/" +uri;
                 }
-                objectUris.add(uri);
+                if(!objectUris.contains(uri)) {
+                    objectUris.add(uri);
+                }
 
             }
             m.addAttribute("allUris", objectUris);
@@ -86,9 +86,11 @@ public class ObjectsController {
     }
 
     @PostMapping("/objects/{bucketName}")
-    public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file) {
+    public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file,Model m) {
         byte[] arrayBytes = null;
+
         Bucket bucket = (Bucket) session.getAttribute("bucket");
+        m.addAttribute("bucketName",bucket.getUri());
         try {
             arrayBytes = file.getBytes();
         } catch (IOException e) {
@@ -109,39 +111,54 @@ public class ObjectsController {
     }
 
     @GetMapping("/objects/{bucketName}/**")
-    public String getobject(HttpServletRequest req, Model m) {
-        int cont = 1;
+    public String getobject(@PathVariable String bucketName,HttpServletRequest req, Model m) {
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         String s = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String sSubstring = s.substring(0,s.length()-1);
+        m.addAttribute("bucketName",sSubstring);
+        s = s.substring(s.indexOf("/")+1);
+        s = s.substring(s.indexOf("/")+1);
+        s = s.substring(s.indexOf("/")+1);
 
-        String[] objectname = new String[]{s.split("/objects")[1]};
-        String objectName = objectname[0];
-        objectName = objectName.replace("%20", " ");
+        s = s.replace("%20", " ");
         // Detectar si és un directori o un objecte. Els directoris sempre acaben en "/"
 
         if (s.endsWith("/")) {
-            cont +=1;
             // directori
             User user = (User) session.getAttribute("user");
             List<Objects> objectsList = myService.allObjects(user, bucket);
-            m.addAttribute("allObjects", objectsList);
+            List<Objects> objectsListFinal = new ArrayList<>();
+            for (int i = 0; i < objectsList.size(); i++) {
+                if (objectsList.get(i).getUri().contains(s)){
+                    objectsListFinal.add(objectsList.get(i));
+                }
+            }
+            m.addAttribute("allObjects", objectsListFinal);
             List<String> objectUris = new ArrayList<>();
-            for (Objects o : objectsList) {
-                String uri = (String) o.getUri().split("/")[cont];
+            for (Objects o : objectsListFinal) {
+                if (!s.startsWith("/")){
+                    s= "/"+s;
+                }
+                String uri = o.getUri().split(s)[1];
+                uri = uri.split("/")[0];
                 if (!uri.contains(".")) {
                     uri = "/" + uri + "/";
                 }else{
                     uri = "/" +uri;
                 }
-                objectUris.add(uri);
-
+                if(!objectUris.contains(uri)) {
+                    objectUris.add(uri);
+                }
             }
             m.addAttribute("allUris", objectUris);
             System.out.println("Directori");
             return "folder";
         } else {
             // objecte
-            Objects o = myService.getObject(bucket.getId(), objectName);
+            if (!s.startsWith("/")){
+                s = "/"+s;
+            }
+            Objects o = myService.getObject(bucket.getId(), s);
             m.addAttribute("object", o);
             return "oneobject";
         }
