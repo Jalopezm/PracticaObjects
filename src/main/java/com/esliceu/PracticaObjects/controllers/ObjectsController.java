@@ -110,6 +110,7 @@ public class ObjectsController {
 
     @GetMapping("/objects/{bucketName}/**")
     public String getobject(HttpServletRequest req, Model m) {
+        int cont = 1;
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         String s = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 
@@ -119,10 +120,23 @@ public class ObjectsController {
         // Detectar si és un directori o un objecte. Els directoris sempre acaben en "/"
 
         if (s.endsWith("/")) {
+            cont +=1;
             // directori
             User user = (User) session.getAttribute("user");
             List<Objects> objectsList = myService.allObjects(user, bucket);
             m.addAttribute("allObjects", objectsList);
+            List<String> objectUris = new ArrayList<>();
+            for (Objects o : objectsList) {
+                String uri = (String) o.getUri().split("/")[cont];
+                if (!uri.contains(".")) {
+                    uri = "/" + uri + "/";
+                }else{
+                    uri = "/" +uri;
+                }
+                objectUris.add(uri);
+
+            }
+            m.addAttribute("allUris", objectUris);
             System.out.println("Directori");
             return "folder";
         } else {

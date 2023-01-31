@@ -6,8 +6,8 @@
 </head>
 <body>
 <table th:if="${allObjects} != null">
-    <tr th:each="objects:${allObjects}">
-        <td><a th:href="@{/objects{uri} (uri=${objects.uri})}" th:text="${objects.uri}"></a></td>
+    <tr th:each="uri:${allUris}">
+        <td><a th:href="@{/objects{uri} (uri=${uri})}" th:text="${uri}"></a></td>
     </tr>
 </table>
 </body>
