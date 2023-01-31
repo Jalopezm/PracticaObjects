@@ -87,8 +87,8 @@ public class MyService {
         return objectDAO.getObject(bucketId,objectname);
     }
 
-    public File getFile(String hash) {
-        return objectDAO.getFile(hash);
+    public File getFile(int id) {
+        return objectDAO.getFile(id);
     }
 
     public void refFileToObject(Objects object, File file) {

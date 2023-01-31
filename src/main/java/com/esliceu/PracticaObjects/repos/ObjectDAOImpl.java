@@ -51,10 +51,10 @@ public class ObjectDAOImpl implements ObjectDAO{
     }
 
     @Override
-    public File getFile(String hash) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where hash=?",new BeanPropertyRowMapper<>(File.class),hash);
+    public File getFile(int id) {
+        List<File> fileList = jdbcTemplate.query("Select * from file where id = ?",new BeanPropertyRowMapper<>(File.class),id);
         File file = fileList.get(0);
-        return file;
+        return  file;
     }
 
     @Override

@@ -102,10 +102,11 @@ public class ObjectsController {
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
         }
-        createdFile = myService.getFile(hash);
-        createdFile.setVersion(createdFile.getVersion() + 1);
+
         String uri = objectForm.getPath() + file.getOriginalFilename();
         Objects object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
+        createdFile = myService.getFile(object.getId());
+        createdFile.setVersion(createdFile.getVersion() + 1);
         myService.refFileToObject(object, createdFile);
         return "redirect:" + bucket.getUri();
     }
@@ -159,6 +160,8 @@ public class ObjectsController {
                 s = "/"+s;
             }
             Objects o = myService.getObject(bucket.getId(), s);
+            File f = myService.getFile(o.getId());
+            m.addAttribute("file",f);
             m.addAttribute("object", o);
             return "oneobject";
         }

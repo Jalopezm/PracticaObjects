@@ -17,7 +17,7 @@ public interface ObjectDAO {
 
     Objects getObject(int bucketId, String objectname);
 
-    File getFile(String hash);
+    File getFile(int id);
 
     void refFileToObject(Objects object, File file);
 }
