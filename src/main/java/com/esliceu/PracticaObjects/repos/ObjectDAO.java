@@ -1,6 +1,7 @@
 package com.esliceu.PracticaObjects.repos;
 
 import com.esliceu.PracticaObjects.model.File;
+import com.esliceu.PracticaObjects.model.ObjectToFileRef;
 import com.esliceu.PracticaObjects.model.Objects;
 
 import java.sql.Timestamp;
@@ -22,4 +23,8 @@ public interface ObjectDAO {
     void refFileToObject(Objects object, File file);
 
     File getFileFromObjId(int id);
+
+    ObjectToFileRef getFileVersion(File createdFile,Objects o);
+
+    List<ObjectToFileRef> getFileToObject(int id);
 }

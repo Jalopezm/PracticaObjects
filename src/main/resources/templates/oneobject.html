@@ -5,7 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-    <p th:text=${object.created}></p>
-    <p th:text=${file.hash}></p>
+<table>
+    <tr th:each="v:${of}">
+        <td><p th:text=${file.hash}></p></td>
+        <td><p th:text=${object.created}></p></td>
+        <td><p th:text=${v.versionId}></p></td>
+        <td><a href="/download">Download</a></td>
+    </tr>
+</table>
 </body>
 </html>

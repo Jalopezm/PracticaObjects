@@ -1,6 +1,7 @@
 package com.esliceu.PracticaObjects.repos;
 
 import com.esliceu.PracticaObjects.model.File;
+import com.esliceu.PracticaObjects.model.ObjectToFileRef;
 import com.esliceu.PracticaObjects.model.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -42,7 +43,10 @@ public class ObjectDAOImpl implements ObjectDAO{
     @Override
     public Objects getObject(int bucketId, String objectname) {
         List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId = ? and uri = ?",new BeanPropertyRowMapper<>(Objects.class),bucketId,objectname);
-        return objectsList.get(0);
+        if (objectsList.size()> 0){
+            return objectsList.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -59,8 +63,23 @@ public class ObjectDAOImpl implements ObjectDAO{
 
     @Override
     public File getFileFromObjId(int id) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where id = (Select idFile from filetoobject where idObject = ?)",new BeanPropertyRowMapper<>(File.class),id);
+        List<File> fileList = jdbcTemplate.query("Select * from file where id = (Select idFile from filetoobject where idObject = ? Limit 1)",new BeanPropertyRowMapper<>(File.class),id);
         return fileList.get(0);
+    }
+
+    @Override
+    public ObjectToFileRef getFileVersion(File createdFile, Objects object) {
+        List<ObjectToFileRef> refList  = jdbcTemplate.query("Select versionId from filetoobject where idFile = ? AND idObject = ? ORDER BY versionId DESC;" ,new BeanPropertyRowMapper<>(ObjectToFileRef.class),createdFile.getId(), object.getId());
+        if (refList.size()> 0){
+            return refList.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<ObjectToFileRef> getFileToObject(int id) {
+        List <ObjectToFileRef> ref = jdbcTemplate.query("Select * from filetoobject where idObject = ?" ,new BeanPropertyRowMapper<>(ObjectToFileRef.class),id);
+        return ref;
     }
 
 

@@ -1,9 +1,6 @@
 package com.esliceu.PracticaObjects.service;
 
-import com.esliceu.PracticaObjects.model.Bucket;
-import com.esliceu.PracticaObjects.model.File;
-import com.esliceu.PracticaObjects.model.Objects;
-import com.esliceu.PracticaObjects.model.User;
+import com.esliceu.PracticaObjects.model.*;
 import com.esliceu.PracticaObjects.repos.BucketDAO;
 import com.esliceu.PracticaObjects.repos.ObjectDAO;
 import com.esliceu.PracticaObjects.repos.UserDAO;
@@ -98,5 +95,17 @@ public class MyService {
     public File getFileFromObjId(Bucket bucket, Objects o) {
         Objects object = objectDAO.getObject(bucket.getId(),o.getUri());
         return objectDAO.getFileFromObjId(object.getId());
+    }
+
+    public int getFileVersion(File createdFile, Objects o) {
+        ObjectToFileRef ref = objectDAO.getFileVersion(createdFile, o);
+        if (ref == null){
+            return 0;
+        }
+       return ref.getVersionId();
+    }
+
+    public List<ObjectToFileRef> getFileToObject(int id) {
+        return objectDAO.getFileToObject(id);
     }
 }

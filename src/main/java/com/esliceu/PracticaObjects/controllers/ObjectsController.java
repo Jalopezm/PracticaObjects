@@ -1,12 +1,10 @@
 package com.esliceu.PracticaObjects.controllers;
 
-import com.esliceu.PracticaObjects.model.forms.BucketForm;
-import com.esliceu.PracticaObjects.model.forms.ObjectForm;
-import com.esliceu.PracticaObjects.model.Bucket;
-import com.esliceu.PracticaObjects.model.File;
-import com.esliceu.PracticaObjects.model.Objects;
-import com.esliceu.PracticaObjects.model.User;
+import com.esliceu.PracticaObjects.forms.BucketForm;
+import com.esliceu.PracticaObjects.forms.ObjectForm;
+import com.esliceu.PracticaObjects.model.*;
 import com.esliceu.PracticaObjects.service.MyService;
+import com.esliceu.PracticaObjects.utils.HashCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -21,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,7 +32,8 @@ public class ObjectsController {
     MyService myService;
     @Autowired
     HttpSession session;
-
+    @Autowired
+    HashCode textToHash;
 
     @GetMapping("/objects")
     public String objects(Model m) {
@@ -69,10 +69,10 @@ public class ObjectsController {
                 String uri = o.getUri().split("/")[1];
                 if (!uri.contains(".")) {
                     uri = "/" + uri + "/";
-                }else{
-                    uri = "/" +uri;
+                } else {
+                    uri = "/" + uri;
                 }
-                if(!objectUris.contains(uri)) {
+                if (!objectUris.contains(uri)) {
                     objectUris.add(uri);
                 }
 
@@ -83,27 +83,37 @@ public class ObjectsController {
     }
 
     @PostMapping("/objects/{bucketName}")
-    public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file,Model m) {
+    public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file, Model m) {
         byte[] arrayBytes;
 
         Bucket bucket = (Bucket) session.getAttribute("bucket");
-        m.addAttribute("bucketName",bucket.getUri());
+        m.addAttribute("bucketName", bucket.getUri());
         try {
             arrayBytes = file.getBytes();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String hash = String.valueOf(Arrays.hashCode(arrayBytes));
+        String hash = null;
+        try {
+            hash = textToHash.getHashSHA256(Arrays.toString(arrayBytes));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         File createdFile;
-
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
         }
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
-        Objects object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
+        Objects object = myService.getObject(bucket.getId(), uri);
+        int version;
+        if (object == null) {
+            object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
+            version = 0;
+        }
         createdFile = myService.getFileFromHash(hash);
-        createdFile.setVersion(createdFile.getVersion() + 1);
+        version = myService.getFileVersion(createdFile, object);
+        createdFile.setVersion(version + 1);
         myService.refFileToObject(object, createdFile);
         return "redirect:" + bucket.getUri();
     }
@@ -112,11 +122,11 @@ public class ObjectsController {
     public String getobject(HttpServletRequest req, Model m) {
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         String s = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        String sSubstring = s.substring(0,s.length()-1);
-        m.addAttribute("bucketName",sSubstring);
-        s = s.substring(s.indexOf("/")+1);
-        s = s.substring(s.indexOf("/")+1);
-        s = s.substring(s.indexOf("/")+1);
+        String sSubstring = s.substring(0, s.length() - 1);
+        m.addAttribute("bucketName", sSubstring);
+        s = s.substring(s.indexOf("/") + 1);
+        s = s.substring(s.indexOf("/") + 1);
+        s = s.substring(s.indexOf("/") + 1);
 
         s = s.replace("%20", " ");
         // Detectar si és un directori o un objecte. Els directoris sempre acaben en "/"
@@ -134,17 +144,17 @@ public class ObjectsController {
             m.addAttribute("allObjects", objectsListFinal);
             List<String> objectUris = new ArrayList<>();
             for (Objects o : objectsListFinal) {
-                if (!s.startsWith("/")){
-                    s= "/"+s;
+                if (!s.startsWith("/")) {
+                    s = "/" + s;
                 }
                 String uri = o.getUri().split(s)[1];
                 uri = uri.split("/")[0];
                 if (!uri.contains(".")) {
                     uri = "/" + uri + "/";
-                }else{
-                    uri = "/" +uri;
+                } else {
+                    uri = "/" + uri;
                 }
-                if(!objectUris.contains(uri)) {
+                if (!objectUris.contains(uri)) {
                     objectUris.add(uri);
                 }
             }
@@ -153,13 +163,16 @@ public class ObjectsController {
             return "folder";
         } else {
             // objecte
-            if (!s.startsWith("/")){
-                s = "/"+s;
+            if (!s.startsWith("/")) {
+                s = "/" + s;
             }
             Objects o = myService.getObject(bucket.getId(), s);
-            File f = myService.getFileFromObjId(bucket,o);
-            m.addAttribute("file",f);
+            File f = myService.getFileFromObjId(bucket, o);
+            List<ObjectToFileRef> of = myService.getFileToObject(o.getId());
+
+            m.addAttribute("file", f);
             m.addAttribute("object", o);
+            m.addAttribute("of", of);
             return "oneobject";
         }
     }
