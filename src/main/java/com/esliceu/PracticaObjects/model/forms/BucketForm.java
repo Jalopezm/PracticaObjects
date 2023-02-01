@@ -1,4 +1,4 @@
-package com.esliceu.PracticaObjects.forms;
+package com.esliceu.PracticaObjects.model.forms;
 
 import java.sql.Timestamp;
 

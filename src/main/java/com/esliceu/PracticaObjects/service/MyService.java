@@ -87,11 +87,16 @@ public class MyService {
         return objectDAO.getObject(bucketId,objectname);
     }
 
-    public File getFile(int id) {
-        return objectDAO.getFile(id);
+    public File getFileFromHash(String hash) {
+        return objectDAO.getFileFromHash(hash);
     }
 
     public void refFileToObject(Objects object, File file) {
         objectDAO.refFileToObject(object,file);
+    }
+
+    public File getFileFromObjId(Bucket bucket, Objects o) {
+        Objects object = objectDAO.getObject(bucket.getId(),o.getUri());
+        return objectDAO.getFileFromObjId(object.getId());
     }
 }

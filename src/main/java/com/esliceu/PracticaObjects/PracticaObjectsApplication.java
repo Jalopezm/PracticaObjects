@@ -14,6 +14,6 @@ public class PracticaObjectsApplication {
 //	@Override
 //	public void addInterceptors(InterceptorRegistry registry){
 //		registry.addInterceptor(new MyAuthInterceptor())
-//				.addPathPatterns("/abjects/**");
+//				.addPathPatterns("/objects/**");
 //	}
 }

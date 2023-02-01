@@ -1,13 +1,12 @@
 package com.esliceu.PracticaObjects.controllers;
 
-import com.esliceu.PracticaObjects.forms.BucketForm;
-import com.esliceu.PracticaObjects.forms.ObjectForm;
+import com.esliceu.PracticaObjects.model.forms.BucketForm;
+import com.esliceu.PracticaObjects.model.forms.ObjectForm;
 import com.esliceu.PracticaObjects.model.Bucket;
 import com.esliceu.PracticaObjects.model.File;
 import com.esliceu.PracticaObjects.model.Objects;
 import com.esliceu.PracticaObjects.model.User;
 import com.esliceu.PracticaObjects.service.MyService;
-import com.esliceu.PracticaObjects.utils.EncriptPass;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -34,8 +33,6 @@ public class ObjectsController {
     MyService myService;
     @Autowired
     HttpSession session;
-    @Autowired
-    EncriptPass encriptPass;
 
 
     @GetMapping("/objects")
@@ -61,7 +58,7 @@ public class ObjectsController {
         User user = (User) session.getAttribute("user");
         m.addAttribute("bucketName", bucketName);
         m.addAttribute("userName", user.getNickname());
-        if (bucketName != "") {
+        if (!bucketName.equals("")) {
             Bucket bucket = myService.getBucket(bucketName, user.getNickname());
             session.setAttribute("bucket", bucket);
             session.setAttribute("bucketName", bucketName);
@@ -69,7 +66,7 @@ public class ObjectsController {
             m.addAttribute("allObjects", objectsList);
             List<String> objectUris = new ArrayList<>();
             for (Objects o : objectsList) {
-                String uri = (String) o.getUri().split("/")[1];
+                String uri = o.getUri().split("/")[1];
                 if (!uri.contains(".")) {
                     uri = "/" + uri + "/";
                 }else{
@@ -87,7 +84,7 @@ public class ObjectsController {
 
     @PostMapping("/objects/{bucketName}")
     public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file,Model m) {
-        byte[] arrayBytes = null;
+        byte[] arrayBytes;
 
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         m.addAttribute("bucketName",bucket.getUri());
@@ -97,7 +94,7 @@ public class ObjectsController {
             throw new RuntimeException(e);
         }
         String hash = String.valueOf(Arrays.hashCode(arrayBytes));
-        File createdFile = null;
+        File createdFile;
 
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
@@ -105,14 +102,14 @@ public class ObjectsController {
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
         Objects object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
-        createdFile = myService.getFile(object.getId());
+        createdFile = myService.getFileFromHash(hash);
         createdFile.setVersion(createdFile.getVersion() + 1);
         myService.refFileToObject(object, createdFile);
         return "redirect:" + bucket.getUri();
     }
 
     @GetMapping("/objects/{bucketName}/**")
-    public String getobject(@PathVariable String bucketName,HttpServletRequest req, Model m) {
+    public String getobject(HttpServletRequest req, Model m) {
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         String s = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String sSubstring = s.substring(0,s.length()-1);
@@ -129,9 +126,9 @@ public class ObjectsController {
             User user = (User) session.getAttribute("user");
             List<Objects> objectsList = myService.allObjects(user, bucket);
             List<Objects> objectsListFinal = new ArrayList<>();
-            for (int i = 0; i < objectsList.size(); i++) {
-                if (objectsList.get(i).getUri().contains(s)){
-                    objectsListFinal.add(objectsList.get(i));
+            for (Objects objects : objectsList) {
+                if (objects.getUri().contains(s)) {
+                    objectsListFinal.add(objects);
                 }
             }
             m.addAttribute("allObjects", objectsListFinal);
@@ -160,7 +157,7 @@ public class ObjectsController {
                 s = "/"+s;
             }
             Objects o = myService.getObject(bucket.getId(), s);
-            File f = myService.getFile(o.getId());
+            File f = myService.getFileFromObjId(bucket,o);
             m.addAttribute("file",f);
             m.addAttribute("object", o);
             return "oneobject";

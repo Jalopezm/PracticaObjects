@@ -1,6 +1,6 @@
 package com.esliceu.PracticaObjects.controllers;
 
-import com.esliceu.PracticaObjects.forms.UserForm;
+import com.esliceu.PracticaObjects.model.forms.UserForm;
 import com.esliceu.PracticaObjects.model.User;
 import com.esliceu.PracticaObjects.service.MyService;
 import com.esliceu.PracticaObjects.utils.EncriptPass;
@@ -84,10 +84,6 @@ public class AppController {
         m.addAttribute("user",user);
         return "redirect:/settings";
     }
-
-
-
-
 
 
 

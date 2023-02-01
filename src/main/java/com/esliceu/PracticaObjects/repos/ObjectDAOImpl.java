@@ -30,37 +30,37 @@ public class ObjectDAOImpl implements ObjectDAO{
     public Objects newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
         jdbcTemplate.update("Insert into object (bucketId,uri,lastModified,owner,created,contentType) values (?,?,?,?,?,?)" ,bucketId,uri,from,owner,from1,contentType);
         List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId=?",new BeanPropertyRowMapper<>(Objects.class),bucketId);
-        Objects object = objectsList.get(objectsList.size()-1);
-        return object;
+        return objectsList.get(objectsList.size()-1);
     }
 
     @Override
     public boolean fileOnDb(String hash) {
         List<File> fileList = jdbcTemplate.query("Select * from file where hash = ?" ,new BeanPropertyRowMapper<>(File.class), hash);
-        if (fileList.size() > 0){
-            return true;
-        }
-        return false;
+        return fileList.size() > 0;
     }
 
     @Override
     public Objects getObject(int bucketId, String objectname) {
         List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId = ? and uri = ?",new BeanPropertyRowMapper<>(Objects.class),bucketId,objectname);
-        Objects object = objectsList.get(0);
-        return object;
+        return objectsList.get(0);
     }
 
     @Override
-    public File getFile(int id) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where id = ?",new BeanPropertyRowMapper<>(File.class),id);
-        File file = fileList.get(0);
-        return  file;
+    public File getFileFromHash(String hash) {
+        List<File> fileList = jdbcTemplate.query("Select * from file where hash = ?",new BeanPropertyRowMapper<>(File.class),hash);
+        return fileList.get(0);
     }
 
     @Override
     public void refFileToObject(Objects object, File file) {
         jdbcTemplate.update("Insert into filetoobject (idObject,idFile,date,versionId) values (?,?,?,?)" ,object.getId(),file.getId(),object.getCreated(),file.getVersion());
 
+    }
+
+    @Override
+    public File getFileFromObjId(int id) {
+        List<File> fileList = jdbcTemplate.query("Select * from file where id = (Select idFile from filetoobject where idObject = ?)",new BeanPropertyRowMapper<>(File.class),id);
+        return fileList.get(0);
     }
 
 

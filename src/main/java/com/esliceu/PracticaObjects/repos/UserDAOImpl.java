@@ -21,8 +21,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public boolean logUser(String nickname, String password) {
         List<User> userList = jdbcTemplate.query("Select * from user where nickname = ? and password = ?", new BeanPropertyRowMapper<>(User.class), nickname, password);
-        for (int i = 0; i < userList.size(); i++) {
-            User currUser = userList.get(i);
+        for (User currUser : userList) {
             if (currUser.getNickname().equals(nickname) && currUser.getPassword().equals(password)) {
                 return true;
             }
@@ -33,10 +32,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public boolean validateUser(String name) {
         List<User> userList = jdbcTemplate.query("Select nickname from user where nickname = ? ", new BeanPropertyRowMapper<>(User.class), name);
-        if (userList.size() > 0){
-            return true;
-        }
-        return false;
+        return userList.size() > 0;
     }
 
     @Override

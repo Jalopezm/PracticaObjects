@@ -1,4 +1,4 @@
-package com.esliceu.PracticaObjects.forms;
+package com.esliceu.PracticaObjects.model.forms;
 
 public class ObjectForm {
     String path;
