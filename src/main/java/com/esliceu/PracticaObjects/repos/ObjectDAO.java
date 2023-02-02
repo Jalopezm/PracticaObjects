@@ -31,4 +31,8 @@ public interface ObjectDAO {
     File getFileFromFileId(int fid);
 
     Objects getObjectFromObjId(int objid);
+
+    void deleteObject(String object);
+
+    void updateLink(File f);
 }

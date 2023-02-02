@@ -6,6 +6,15 @@ public class File {
     int contentLength;
     String hash;
     int version;
+    int link;
+
+    public int getLink() {
+        return link;
+    }
+
+    public void setLink(int link) {
+        this.link = link;
+    }
 
     public void setVersion(int version) {
         this.version = version;

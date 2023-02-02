@@ -17,8 +17,8 @@
 <h2>Create New Object</h2>
 <form th:action ="@{/objects/{bucketName}(bucketName=${bucketName})}" method="post" enctype="multipart/form-data">
   <label for="path">Path</label>
-  <input type="text" name="path" id="path" th:value="'/'">
-  <input type="file" name="file" id="file">
+  <input type="text" name="path" id="path" th:value="'/'" required>
+  <input type="file" name="file" id="file" required>
   <input type="submit" value="Send">
 </form>
 <div th:if="${message} != null">

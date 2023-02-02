@@ -12,38 +12,38 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
-public class ObjectDAOImpl implements ObjectDAO{
+public class ObjectDAOImpl implements ObjectDAO {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Objects> getAllObjects(String nickname,int bucketId) {
-        return jdbcTemplate.query("Select * from object where owner= ? and bucketId=?",new BeanPropertyRowMapper<>(Objects.class), nickname,bucketId);
+    public List<Objects> getAllObjects(String nickname, int bucketId) {
+        return jdbcTemplate.query("Select * from object where owner= ? and bucketId=?", new BeanPropertyRowMapper<>(Objects.class), nickname, bucketId);
     }
 
     @Override
     public void newFile(byte[] arrayBytes, int length, String hash) {
-        jdbcTemplate.update("Insert into file (body,contentLength,hash) values (?,?,?)" ,arrayBytes,length,hash);
+        jdbcTemplate.update("Insert into file (body,contentLength,hash) values (?,?,?)", arrayBytes, length, hash);
     }
 
 
     @Override
     public Objects newObject(int bucketId, String uri, Timestamp from, String owner, Timestamp from1, String contentType) {
-        jdbcTemplate.update("Insert into object (bucketId,uri,lastModified,owner,created,contentType) values (?,?,?,?,?,?)" ,bucketId,uri,from,owner,from1,contentType);
-        List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId=?",new BeanPropertyRowMapper<>(Objects.class),bucketId);
-        return objectsList.get(objectsList.size()-1);
+        jdbcTemplate.update("Insert into object (bucketId,uri,lastModified,owner,created,contentType) values (?,?,?,?,?,?)", bucketId, uri, from, owner, from1, contentType);
+        List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId=?", new BeanPropertyRowMapper<>(Objects.class), bucketId);
+        return objectsList.get(objectsList.size() - 1);
     }
 
     @Override
     public boolean fileOnDb(String hash) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where hash = ?" ,new BeanPropertyRowMapper<>(File.class), hash);
+        List<File> fileList = jdbcTemplate.query("Select * from file where hash = ?", new BeanPropertyRowMapper<>(File.class), hash);
         return fileList.size() > 0;
     }
 
     @Override
     public Objects getObject(int bucketId, String objectname) {
-        List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId = ? and uri = ?",new BeanPropertyRowMapper<>(Objects.class),bucketId,objectname);
-        if (objectsList.size()> 0){
+        List<Objects> objectsList = jdbcTemplate.query("Select * from object where bucketId = ? and uri = ?", new BeanPropertyRowMapper<>(Objects.class), bucketId, objectname);
+        if (objectsList.size() > 0) {
             return objectsList.get(0);
         }
         return null;
@@ -51,26 +51,26 @@ public class ObjectDAOImpl implements ObjectDAO{
 
     @Override
     public File getFileFromHash(String hash) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where hash = ?",new BeanPropertyRowMapper<>(File.class),hash);
+        List<File> fileList = jdbcTemplate.query("Select * from file where hash = ?", new BeanPropertyRowMapper<>(File.class), hash);
         return fileList.get(0);
     }
 
     @Override
     public void refFileToObject(Objects object, File file) {
-        jdbcTemplate.update("Insert into filetoobject (idObject,idFile,date,versionId) values (?,?,?,?)" ,object.getId(),file.getId(),object.getCreated(),file.getVersion());
+        jdbcTemplate.update("Insert into filetoobject (idObject,idFile,date,versionId) values (?,?,?,?)", object.getId(), file.getId(), object.getCreated(), file.getVersion());
 
     }
 
     @Override
     public File getFileFromObjId(int id) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where id = (Select idFile from filetoobject where idObject = ? Limit 1)",new BeanPropertyRowMapper<>(File.class),id);
+        List<File> fileList = jdbcTemplate.query("Select * from file where id = (Select idFile from filetoobject where idObject = ? Limit 1)", new BeanPropertyRowMapper<>(File.class), id);
         return fileList.get(0);
     }
 
     @Override
     public ObjectToFileRef getFileVersion(File createdFile, Objects object) {
-        List<ObjectToFileRef> refList  = jdbcTemplate.query("Select versionId from filetoobject where idFile = ? AND idObject = ? ORDER BY versionId DESC;" ,new BeanPropertyRowMapper<>(ObjectToFileRef.class),createdFile.getId(), object.getId());
-        if (refList.size()> 0){
+        List<ObjectToFileRef> refList = jdbcTemplate.query("Select versionId from filetoobject where idFile = ? AND idObject = ? ORDER BY versionId DESC;", new BeanPropertyRowMapper<>(ObjectToFileRef.class), createdFile.getId(), object.getId());
+        if (refList.size() > 0) {
             return refList.get(0);
         }
         return null;
@@ -78,20 +78,32 @@ public class ObjectDAOImpl implements ObjectDAO{
 
     @Override
     public List<ObjectToFileRef> getFileToObject(int id) {
-        List <ObjectToFileRef> ref = jdbcTemplate.query("Select * from filetoobject where idObject = ?" ,new BeanPropertyRowMapper<>(ObjectToFileRef.class),id);
+        List<ObjectToFileRef> ref = jdbcTemplate.query("Select * from filetoobject where idObject = ?", new BeanPropertyRowMapper<>(ObjectToFileRef.class), id);
         return ref;
     }
 
     @Override
     public File getFileFromFileId(int fid) {
-        List<File> fileList =   jdbcTemplate.query("Select * from file where id = ?", new BeanPropertyRowMapper<>(File.class),fid);
+        List<File> fileList = jdbcTemplate.query("Select * from file where id = ?", new BeanPropertyRowMapper<>(File.class), fid);
         return fileList.get(0);
     }
 
     @Override
     public Objects getObjectFromObjId(int objid) {
-        List<Objects> objectsList =  jdbcTemplate.query("Select * from object where id = ?",new BeanPropertyRowMapper<>(Objects.class),objid);
-        return  objectsList.get(0);
+        List<Objects> objectsList = jdbcTemplate.query("Select * from object where id = ?", new BeanPropertyRowMapper<>(Objects.class), objid);
+        return objectsList.get(0);
+    }
+
+    @Override
+    public void deleteObject(String objectUri) {
+        jdbcTemplate.update("Delete from object where uri=? and owner=?", new BeanPropertyRowMapper<>(Objects.class), objectUri);
+    }
+
+    @Override
+    public void updateLink(File f) {
+        int link = f.getLink();
+        link += 1;
+        jdbcTemplate.update("UPDATE file SET link = ? WHERE hash=?", link, f.getHash());
     }
 
 

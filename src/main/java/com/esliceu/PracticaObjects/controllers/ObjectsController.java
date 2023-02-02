@@ -52,6 +52,12 @@ public class ObjectsController {
 
     @PostMapping("/objects")
     public String objectsPost(@Valid BucketForm bucketForm, Model m) {
+        if (bucketForm.getUri().startsWith("/")){
+            bucketForm.setUri(bucketForm.getUri().substring(1));
+            if (bucketForm.getUri().endsWith("/")){
+                bucketForm.setUri(bucketForm.getUri().substring(0,bucketForm.getUri().length()-1));
+            }
+        }
         User user = (User) session.getAttribute("user");
         Bucket bucket = myService.bucketOnDb(bucketForm.getUri());
         if (bucket == null) {
@@ -113,6 +119,8 @@ public class ObjectsController {
         File createdFile;
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
+        }else{
+            myService.updateLink(hash);
         }
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
@@ -169,6 +177,7 @@ public class ObjectsController {
                     objectUris.add(uri);
                 }
             }
+
             m.addAttribute("allUris", objectUris);
             System.out.println("Directori");
             return "folder";
@@ -199,5 +208,9 @@ public class ObjectsController {
         headers.set("Content-disposition","attachment ;filename = "+ name);
         return new ResponseEntity<>(content,headers, HttpStatus.OK);
     }
-
+    @GetMapping("/delete/{object}")
+    public String delete(@PathVariable String object){
+        myService.deleteObject(object);
+        return "object";
+    }
 }

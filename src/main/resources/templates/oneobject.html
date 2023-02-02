@@ -16,5 +16,6 @@
         <td><a th:href="@{/download/{objid}/{fid}(objid=${object.id},fid=${file.id})}">Download</a></td>
     </tr>
 </table>
+<a th:href="@{/delete/{object}/ (object=${object.uri})}">DELETE</a>
 </body>
 </html>

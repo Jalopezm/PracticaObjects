@@ -120,4 +120,13 @@ public class MyService {
     public Bucket bucketOnDb(String uri) {
         return bucketDAO.bucketOnDb(uri);
     }
+
+    public void deleteObject(String object) {
+        objectDAO.deleteObject(object);
+    }
+
+    public void updateLink(String hash) {
+        File f = objectDAO.getFileFromHash(hash);
+        objectDAO.updateLink(f);
+    }
 }
