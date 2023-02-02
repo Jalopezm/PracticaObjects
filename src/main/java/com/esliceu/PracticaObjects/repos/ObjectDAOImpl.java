@@ -82,5 +82,17 @@ public class ObjectDAOImpl implements ObjectDAO{
         return ref;
     }
 
+    @Override
+    public File getFileFromFileId(int fid) {
+        List<File> fileList =   jdbcTemplate.query("Select * from file where id = ?", new BeanPropertyRowMapper<>(File.class),fid);
+        return fileList.get(0);
+    }
+
+    @Override
+    public Objects getObjectFromObjId(int objid) {
+        List<Objects> objectsList =  jdbcTemplate.query("Select * from object where id = ?",new BeanPropertyRowMapper<>(Objects.class),objid);
+        return  objectsList.get(0);
+    }
+
 
 }

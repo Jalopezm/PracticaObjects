@@ -108,4 +108,16 @@ public class MyService {
     public List<ObjectToFileRef> getFileToObject(int id) {
         return objectDAO.getFileToObject(id);
     }
+
+    public File getFileFromFileId(int fid) {
+        return objectDAO.getFileFromFileId(fid);
+    }
+
+    public Objects getObjectFromObjId(int objid) {
+        return objectDAO.getObjectFromObjId(objid);
+    }
+
+    public Bucket bucketOnDb(String uri) {
+        return bucketDAO.bucketOnDb(uri);
+    }
 }

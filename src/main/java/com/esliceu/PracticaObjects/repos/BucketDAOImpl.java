@@ -25,6 +25,18 @@ public class BucketDAOImpl implements BucketDAO{
     @Override
     public Bucket getBucket(String uri, String owner) {
         List<Bucket> bucketList = jdbcTemplate.query("Select * from bucket where owner=? and uri = ?",new BeanPropertyRowMapper<>(Bucket.class), owner,uri);
-        return bucketList.get(0);
+        if (bucketList.size() > 0){
+            return bucketList.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public Bucket bucketOnDb(String uri) {
+        List<Bucket> bucketList = jdbcTemplate.query("Select * from bucket where uri = ?",new BeanPropertyRowMapper<>(Bucket.class),uri);
+        if (bucketList.size() > 0){
+            return bucketList.get(0);
+        }
+        return null;
     }
 }

@@ -9,6 +9,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,15 +45,22 @@ public class ObjectsController {
         m.addAttribute("userName", user.getNickname());
         List<Bucket> bucketList = myService.allBuckets(user);
         m.addAttribute("allBuckets", bucketList);
+        m.addAttribute("message",session.getAttribute("message"));
+        session.setAttribute("message","");
         return "buckets";
     }
 
     @PostMapping("/objects")
     public String objectsPost(@Valid BucketForm bucketForm, Model m) {
         User user = (User) session.getAttribute("user");
-        bucketForm.setOwner(user.getNickname());
-        myService.newBucket(bucketForm.getUri(), bucketForm.getOwner());
-        m.addAttribute("message", "Bucket Created");
+        Bucket bucket = myService.bucketOnDb(bucketForm.getUri());
+        if (bucket == null) {
+            bucketForm.setOwner(user.getNickname());
+            myService.newBucket(bucketForm.getUri(), bucketForm.getOwner());
+            session.setAttribute("message","Bucket Created");
+        }else{
+            session.setAttribute("message","Bucket Already Exists");
+        }
         return "redirect:objects";
     }
 
@@ -176,15 +187,17 @@ public class ObjectsController {
             return "oneobject";
         }
     }
-//    @GetMapping("")
-//    public ResponseEntity<byte[]> download(){
-//        byte[] content = file.getContent();
-//        String name = object.getName();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentLength(content.length);
-//        headers.setContentType(MediaType.valueOf(""));
-//        headers.set("Content-disposition","attachment ;filename = "+ name);
-//        return new ResponseEntity<>(content,headers, HttpStatus.OK);
-//    }
+    @GetMapping("/download/{objid}/{fid}")
+    public ResponseEntity<byte[]> download(@PathVariable String objid,@PathVariable String fid){
+        File file = myService.getFileFromFileId(Integer.parseInt(fid));
+        byte[] content = file.getBody();
+        Objects object = myService.getObjectFromObjId(Integer.parseInt(objid));
+        String name = object.getUri();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(content.length);
+        headers.setContentType(MediaType.valueOf(object.getContentType()));
+        headers.set("Content-disposition","attachment ;filename = "+ name);
+        return new ResponseEntity<>(content,headers, HttpStatus.OK);
+    }
 
 }

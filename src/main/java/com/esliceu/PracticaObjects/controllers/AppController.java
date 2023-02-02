@@ -37,7 +37,6 @@ public class AppController {
         if (myService.validateUser(userForm.getNickname())) {
             m.addAttribute("message", "User Already Exists Select Other User Name");
             return "signup";
-
         } else {
             myService.newUser(userForm.getName(),userForm.getNickname(),userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()));
             m.addAttribute("message", "OK");

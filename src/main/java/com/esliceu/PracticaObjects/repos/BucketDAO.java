@@ -10,4 +10,6 @@ public interface BucketDAO {
     List<Bucket> getAllBuckets(String user);
 
     Bucket getBucket(String uri, String owner);
+
+    Bucket bucketOnDb(String uri);
 }

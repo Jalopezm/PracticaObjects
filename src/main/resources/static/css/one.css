@@ -1,0 +1,12 @@
+html,
+#body {
+  height: 100%;
+  background-color: #333333;
+  color:#fff;
+}
+table{
+    width:100%;
+}
+td{
+    margin:15px;
+}

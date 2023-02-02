@@ -27,4 +27,8 @@ public interface ObjectDAO {
     ObjectToFileRef getFileVersion(File createdFile,Objects o);
 
     List<ObjectToFileRef> getFileToObject(int id);
+
+    File getFileFromFileId(int fid);
+
+    Objects getObjectFromObjId(int objid);
 }
