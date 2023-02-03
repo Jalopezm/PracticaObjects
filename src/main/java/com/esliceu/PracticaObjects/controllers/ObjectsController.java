@@ -125,6 +125,7 @@ public class ObjectsController {
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
         Objects object = myService.getObject(bucket.getId(), uri);
+        uri = bucket.getUri()+uri;
         int version;
         if (object == null) {
             object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
@@ -186,6 +187,7 @@ public class ObjectsController {
             if (!s.startsWith("/")) {
                 s = "/" + s;
             }
+            s = bucket.getUri()+s;
             Objects o = myService.getObject(bucket.getId(), s);
             File f = myService.getFileFromObjId(bucket, o);
             List<ObjectToFileRef> of = myService.getFileToObject(o.getId());
@@ -208,9 +210,9 @@ public class ObjectsController {
         headers.set("Content-disposition","attachment ;filename = "+ name);
         return new ResponseEntity<>(content,headers, HttpStatus.OK);
     }
-    @GetMapping("/delete/{object}")
+    @GetMapping("/deleteobj/{bucket}/{object}/")
     public String delete(@PathVariable String object){
         myService.deleteObject(object);
-        return "object";
+        return "objects";
     }
 }

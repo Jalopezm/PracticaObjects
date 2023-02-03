@@ -96,7 +96,7 @@ public class ObjectDAOImpl implements ObjectDAO {
 
     @Override
     public void deleteObject(String objectUri) {
-        jdbcTemplate.update("Delete from object where uri=? and owner=?", new BeanPropertyRowMapper<>(Objects.class), objectUri);
+        jdbcTemplate.update("Delete from object where uri=?", new BeanPropertyRowMapper<>(Objects.class), objectUri);
     }
 
     @Override
