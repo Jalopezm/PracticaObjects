@@ -210,9 +210,24 @@ public class ObjectsController {
         headers.set("Content-disposition","attachment ;filename = "+ name);
         return new ResponseEntity<>(content,headers, HttpStatus.OK);
     }
-    @GetMapping("/deleteobj/{bucket}/{object}/")
-    public String delete(@PathVariable String object){
-        myService.deleteObject(object);
-        return "objects";
+    @PostMapping("/deleteobj/{object}/**")
+    public String deleteObj(HttpServletRequest req){
+        String object = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        object = object.substring(object.indexOf("/") + 1);
+        object = object.substring(object.indexOf("/") + 1);
+        System.out.println(object);
+        Bucket bucket = (Bucket) session.getAttribute("bucket");
+        myService.deleteObject(object,bucket.getId());
+        return "redirect:"+"/objects";
+    }
+    @PostMapping("/deletebucket/{bucket}")
+    public String deleteBucket(HttpServletRequest req){
+        String object = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        object = object.substring(object.indexOf("/") + 1);
+        object = object.substring(object.indexOf("/") + 1);
+        System.out.println(object);
+        Bucket bucket = (Bucket) session.getAttribute("bucket");
+        myService.deleteObject(object,bucket.getId());
+        return "redirect:"+"/objects";
     }
 }

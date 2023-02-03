@@ -32,7 +32,7 @@ public interface ObjectDAO {
 
     Objects getObjectFromObjId(int objid);
 
-    void deleteObject(String object);
+    void deleteObject(Objects o, File f);
 
     void updateLink(File f);
 }

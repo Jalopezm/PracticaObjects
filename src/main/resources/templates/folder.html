@@ -7,8 +7,26 @@
     <link rel="stylesheet" href= /css/buckets.css>
 </head>
 <body id="body">
-<div th:insert="navbar :: navbar">  </div>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/objects">Bucket</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/signup">SignUp</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/settings">Settings</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 <table th:if="${allObjects} != null">
     <tr th:each="uri:${allUris}">
         <td><a th:href="@{{bucket}{uri} (uri=${uri}, bucket=${bucketName})}" th:text="${uri}"></a></td>

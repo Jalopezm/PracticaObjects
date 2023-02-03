@@ -95,8 +95,14 @@ public class ObjectDAOImpl implements ObjectDAO {
     }
 
     @Override
-    public void deleteObject(String objectUri) {
-        jdbcTemplate.update("Delete from object where uri=?", new BeanPropertyRowMapper<>(Objects.class), objectUri);
+    public void deleteObject(Objects o,File f) {
+        if (f.getLink() <= 1){
+            jdbcTemplate.update("Delete from file where hash=?",f.getHash());
+        }else{
+            jdbcTemplate.update("Update file SET link=? where hash=?",(f.getLink()-1),f.getHash());
+        }
+        jdbcTemplate.update("Delete from filetoobject where idObject=? and idFile=?",o.getId(),f.getId());
+        jdbcTemplate.update("Delete from object where uri=?",o.getUri());
     }
 
     @Override

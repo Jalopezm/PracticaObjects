@@ -8,8 +8,26 @@
 
 </head>
 <body id="body">
-<div th:insert="navbar :: navbar">  </div>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/objects">Bucket</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/signup">SignUp</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/settings">Settings</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 <h1 th:text="'Hello,'+${userName}+'!!'"></h1>
 <div id="content">
 <h2>Create New Bucket</h2>
@@ -22,9 +40,13 @@
 <table th:if="${allBuckets} != null">
     <tr th:each="buckets:${allBuckets}">
         <td><a th:href="@{/objects/{uri} (uri=${buckets.uri})}" th:text="${buckets.uri}"></a></td>
+        <td><form th:action="@{/deletebucket/{bucket}(bucket=${buckets.uri})}" method="post">
+            <input type="submit" th:value="'DELETE:  '+${buckets.uri}">
+        </form></td>
     </tr>
 </table>
 </div>
+
 <div th:if="${message} != null">
     <p th:text="${message}"></p>
 </div>

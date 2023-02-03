@@ -121,8 +121,10 @@ public class MyService {
         return bucketDAO.bucketOnDb(uri);
     }
 
-    public void deleteObject(String object) {
-        objectDAO.deleteObject(object);
+    public void deleteObject(String object,int bucketId) {
+        Objects o = objectDAO.getObject(bucketId,object);
+        File f = objectDAO.getFileFromObjId(o.getId());
+        objectDAO.deleteObject(o,f);
     }
 
     public void updateLink(String hash) {

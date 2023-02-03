@@ -3,11 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link rel="stylesheet" href= /css/one.css>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href=/css/one.css>
 </head>
 <body id="body">
-<div th:insert="navbar :: navbar">  </div>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="/objects">Bucket</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/signup">SignUp</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/settings">Settings</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 <table>
     <tr th:each="v:${of}">
         <td><p th:text="'Hash:  ' + ${file.hash}"></p></td>
@@ -16,6 +37,11 @@
         <td><a th:href="@{/download/{objid}/{fid}(objid=${object.id},fid=${file.id})}">Download</a></td>
     </tr>
 </table>
-<a th:href="@{/delete/{object}/ (object=${object.uri})}">DELETE</a>
+<p th:text="'URI   '+ ${object.uri}"></p>
+
+<form th:action="@{/deleteobj/{objUri}(objUri=${object.uri})}" method="post">
+    <input type="submit" value="DELETE">
+</form>
+
 </body>
 </html>
