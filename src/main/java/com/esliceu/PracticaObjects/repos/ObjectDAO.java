@@ -1,5 +1,6 @@
 package com.esliceu.PracticaObjects.repos;
 
+import com.esliceu.PracticaObjects.model.Bucket;
 import com.esliceu.PracticaObjects.model.File;
 import com.esliceu.PracticaObjects.model.ObjectToFileRef;
 import com.esliceu.PracticaObjects.model.Objects;
@@ -22,7 +23,7 @@ public interface ObjectDAO {
 
     void refFileToObject(Objects object, File file);
 
-    File getFileFromObjId(int id);
+    List<File> getFileFromObjId(int id);
 
     ObjectToFileRef getFileVersion(File createdFile,Objects o);
 
@@ -35,4 +36,6 @@ public interface ObjectDAO {
     void deleteObject(Objects o, File f);
 
     void updateLink(File f);
+
+    void deleteBucket(Bucket bucket);
 }

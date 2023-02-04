@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link rel="stylesheet" href= /css/buckets.css>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href=/css/buckets.css>
 </head>
 <body id="body">
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/objects">Bucket</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -26,21 +28,26 @@
             </li>
         </ul>
     </div>
-</nav><h2>Your Objects</h2>
+</nav>
+<h2>Your Objects</h2>
 <table th:if="${allObjects} != null">
-  <tr th:each="uri:${allUris}">
-    <td><a th:href="@{/objects/{bucket}{uri} (uri=${uri}, bucket=${bucketName})}" th:text="${uri}"></a></td>
-  </tr>
+    <tr th:each="uri:${allUris}">
+        <td><a th:href="@{/objects/{bucket}{uri} (uri=${uri}, bucket=${bucketName})}" th:text="${uri}"></a></td>
+    </tr>
 </table>
 <h2>Create New Object</h2>
-<form th:action ="@{/objects/{bucketName}(bucketName=${bucketName})}" method="post" enctype="multipart/form-data">
-  <label for="path">Path</label>
-  <input type="text" name="path" id="path" th:value="'/'" required>
-  <input type="file" name="file" id="file" required>
-  <input type="submit" value="Send">
+<form th:action="@{/objects/{bucketName}(bucketName=${bucketName})}" method="post" enctype="multipart/form-data">
+    <label for="path">Path</label>
+    <input type="text" name="path" id="path" th:value="'/'" required>
+    <input type="file" name="file" id="file" required>
+    <input type="submit" value="Send">
 </form>
 <div th:if="${message} != null">
     <p th:text="${message}"></p>
 </div>
+<form th:action="@{/deletebucket/{bucket}(bucket=${bucketName})}" method="post">
+    <input type="submit" th:value="'DELETE:  '+${bucketName}">
+</form>
+
 </body>
 </html>

@@ -124,8 +124,8 @@ public class ObjectsController {
         }
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
-        Objects object = myService.getObject(bucket.getId(), uri);
-        uri = bucket.getUri()+uri;
+        uri = bucket.getUri() + uri;
+        Objects object = myService.getObject(bucket.getId(),uri);
         int version;
         if (object == null) {
             object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
@@ -189,10 +189,10 @@ public class ObjectsController {
             }
             s = bucket.getUri()+s;
             Objects o = myService.getObject(bucket.getId(), s);
-            File f = myService.getFileFromObjId(bucket, o);
+            List<File> f = myService.getFileFromObjId(bucket, o);
             List<ObjectToFileRef> of = myService.getFileToObject(o.getId());
 
-            m.addAttribute("file", f);
+            m.addAttribute("fileList", f);
             m.addAttribute("object", o);
             m.addAttribute("of", of);
             return "oneobject";
@@ -226,8 +226,9 @@ public class ObjectsController {
         object = object.substring(object.indexOf("/") + 1);
         object = object.substring(object.indexOf("/") + 1);
         System.out.println(object);
+        User user = (User) session.getAttribute("user");
         Bucket bucket = (Bucket) session.getAttribute("bucket");
-        myService.deleteObject(object,bucket.getId());
+        myService.deleteBucket(user,bucket);
         return "redirect:"+"/objects";
     }
 }

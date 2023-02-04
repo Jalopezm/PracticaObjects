@@ -1,6 +1,7 @@
 package com.esliceu.PracticaObjects.controllers;
 
 import com.esliceu.PracticaObjects.forms.UserForm;
+import com.esliceu.PracticaObjects.model.Bucket;
 import com.esliceu.PracticaObjects.model.User;
 import com.esliceu.PracticaObjects.service.MyService;
 import com.esliceu.PracticaObjects.utils.EncriptPass;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 
 @Controller
@@ -84,21 +87,24 @@ public class AppController {
         return "redirect:/settings";
     }
 
-
-
-//    @GetMapping("/settings/{deleteUser}")
-//    public String deleteUserGet(@Valid UserForm userForm,Model m){
-//        return "deleteUser";
-//    }
-//    @PostMapping("/settings/{deleteUser}")
-//    public String deleteUserPost(@Valid UserForm userForm,Model m){
-//        if (myService.logUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()))){
-//            myService.deleteUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()));
-//            m.addAttribute("message","User Deleted");
-//        }else{
-//            m.addAttribute("message", "Unknown User or Password");
-//        }
-//        return "settings";
-//    }
+    @GetMapping("/settings/{deleteUser}")
+    public String deleteUserGet(@Valid UserForm userForm,Model m){
+        return "deleteUser";
+    }
+    @PostMapping("/settings/{deleteUser}")
+    public String deleteUserPost(@Valid UserForm userForm,Model m){
+        if (myService.logUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()))){
+            myService.deleteUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()));
+            User user = myService.getUser(userForm.getName());
+            List<Bucket> bucketList = myService.allBuckets(user);
+            for (Bucket bucket : bucketList) {
+                myService.deleteBucket(user, bucket);
+            }
+            m.addAttribute("message","User Deleted");
+        }else{
+            m.addAttribute("message", "Unknown User or Password");
+        }
+        return "settings";
+    }
 
 }

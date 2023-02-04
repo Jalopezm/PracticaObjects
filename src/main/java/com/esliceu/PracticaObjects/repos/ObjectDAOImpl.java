@@ -1,5 +1,6 @@
 package com.esliceu.PracticaObjects.repos;
 
+import com.esliceu.PracticaObjects.model.Bucket;
 import com.esliceu.PracticaObjects.model.File;
 import com.esliceu.PracticaObjects.model.ObjectToFileRef;
 import com.esliceu.PracticaObjects.model.Objects;
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -62,9 +64,14 @@ public class ObjectDAOImpl implements ObjectDAO {
     }
 
     @Override
-    public File getFileFromObjId(int id) {
-        List<File> fileList = jdbcTemplate.query("Select * from file where id = (Select idFile from filetoobject where idObject = ? Limit 1)", new BeanPropertyRowMapper<>(File.class), id);
-        return fileList.get(0);
+    public List<File> getFileFromObjId(int id) {
+        List<ObjectToFileRef> list = jdbcTemplate.query("Select * from filetoobject where idObject = ?", new BeanPropertyRowMapper<>(ObjectToFileRef.class), id);
+        List<File> fileList = new ArrayList<>();
+        for (ObjectToFileRef objectToFileRef : list) {
+            List<File> f = jdbcTemplate.query("Select * from file where id =?", new BeanPropertyRowMapper<>(File.class), objectToFileRef.getIdFile());
+            fileList.add(f.get(0));
+        }
+        return fileList;
     }
 
     @Override
@@ -78,8 +85,7 @@ public class ObjectDAOImpl implements ObjectDAO {
 
     @Override
     public List<ObjectToFileRef> getFileToObject(int id) {
-        List<ObjectToFileRef> ref = jdbcTemplate.query("Select * from filetoobject where idObject = ?", new BeanPropertyRowMapper<>(ObjectToFileRef.class), id);
-        return ref;
+        return jdbcTemplate.query("Select * from filetoobject where idObject = ?", new BeanPropertyRowMapper<>(ObjectToFileRef.class), id);
     }
 
     @Override
@@ -95,14 +101,14 @@ public class ObjectDAOImpl implements ObjectDAO {
     }
 
     @Override
-    public void deleteObject(Objects o,File f) {
-        if (f.getLink() <= 1){
-            jdbcTemplate.update("Delete from file where hash=?",f.getHash());
-        }else{
-            jdbcTemplate.update("Update file SET link=? where hash=?",(f.getLink()-1),f.getHash());
+    public void deleteObject(Objects o, File f) {
+        if (f.getLink() <= 1) {
+            jdbcTemplate.update("Delete from file where hash=?", f.getHash());
+        } else {
+            jdbcTemplate.update("Update file SET link=? where hash=?", (f.getLink() - 1), f.getHash());
         }
-        jdbcTemplate.update("Delete from filetoobject where idObject=? and idFile=?",o.getId(),f.getId());
-        jdbcTemplate.update("Delete from object where uri=?",o.getUri());
+        jdbcTemplate.update("Delete from filetoobject where idObject=? and idFile=?", o.getId(), f.getId());
+        jdbcTemplate.update("Delete from object where uri=?", o.getUri());
     }
 
     @Override
@@ -110,6 +116,11 @@ public class ObjectDAOImpl implements ObjectDAO {
         int link = f.getLink();
         link += 1;
         jdbcTemplate.update("UPDATE file SET link = ? WHERE hash=?", link, f.getHash());
+    }
+
+    @Override
+    public void deleteBucket(Bucket bucket) {
+        jdbcTemplate.update("Delete from bucket where id = ?", bucket.getId());
     }
 
 

@@ -3,25 +3,25 @@ package com.esliceu.PracticaObjects.model;
 import java.sql.Timestamp;
 
 public class ObjectToFileRef {
-    int objectId;
-    int fileId;
+    int idObject;
+    int idFile;
     Timestamp uploadDate;
     private int versionId;
 
-    public int getObjectId() {
-        return objectId;
+    public int getIdObject() {
+        return idObject;
     }
 
-    public void setObjectId(int objectId) {
-        this.objectId = objectId;
+    public void setIdObject(int idObject) {
+        this.idObject = idObject;
     }
 
-    public int getFileId() {
-        return fileId;
+    public int getIdFile() {
+        return idFile;
     }
 
-    public void setFileId(int fileId) {
-        this.fileId = fileId;
+    public void setIdFile(int idFile) {
+        this.idFile = idFile;
     }
 
     public Timestamp getUploadDate() {

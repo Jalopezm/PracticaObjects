@@ -1,7 +1,6 @@
 package com.esliceu.PracticaObjects;
 
 import com.esliceu.PracticaObjects.interceptors.MyAuthInterceptor;
-import org.aopalliance.intercept.Interceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

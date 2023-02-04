@@ -40,9 +40,7 @@
 <table th:if="${allBuckets} != null">
     <tr th:each="buckets:${allBuckets}">
         <td><a th:href="@{/objects/{uri} (uri=${buckets.uri})}" th:text="${buckets.uri}"></a></td>
-        <td><form th:action="@{/deletebucket/{bucket}(bucket=${buckets.uri})}" method="post">
-            <input type="submit" th:value="'DELETE:  '+${buckets.uri}">
-        </form></td>
+
     </tr>
 </table>
 </div>
