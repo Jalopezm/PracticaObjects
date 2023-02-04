@@ -14,7 +14,7 @@
     <input type="password" name="password" id="password">
     <input type="submit" value="Send">
 </form>
-<a href="/settings/deleteUser" th:text="'Delete User:'+ ${user.nickname}"></a>
+<a href="/settings/deleteUser" th:text="'Delete User:'+ ${user.name}"></a>
 <div th:if="${message} != null">
     <p th:text="${message}"></p>
 </div>

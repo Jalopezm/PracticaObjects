@@ -37,7 +37,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void deleteUser(String name, String password) {
-    jdbcTemplate.update("Delete from user where name = ? and password = ?", name, password);
+    jdbcTemplate.update("Delete from user where nickname = ? and password = ?", name, password);
     }
 
     @Override

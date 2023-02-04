@@ -39,11 +39,6 @@ public class MyService {
     public void deleteUser(String name, String password) {
         userDAO.deleteUser(name, password);
     }
-
-    public int getUserID(String nickname) {
-        return userDAO.getUserID(nickname);
-    }
-
     public List<Objects> allObjects(User user, Bucket bucket) {
         return objectDAO.getAllObjects(user.getNickname(), bucket.getId());
     }

@@ -101,7 +101,9 @@ public class AppController {
             for (Bucket bucket : bucketList) {
                 myService.deleteBucket(user, bucket);
             }
-            myService.deleteUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()));
+            myService.deleteUser(user.getNickname(),encriptPass.encritpPass(userForm.getPassword()));
+            session.setAttribute("user",null);
+
             m.addAttribute("message","User Deleted");
         }else{
             m.addAttribute("message", "Unknown User or Password");
