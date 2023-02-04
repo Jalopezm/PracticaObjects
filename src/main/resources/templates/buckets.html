@@ -33,14 +33,13 @@
 <h2>Create New Bucket</h2>
 <form action="/objects" method="post">
     <label for="uri">URI</label>
-    <input type="text" name="uri" id="uri">
+    <input type="text" name="uri" id="uri" required>
     <input type="submit" value="Send">
 </form>
 <h2>Your Buckets</h2>
 <table th:if="${allBuckets} != null">
     <tr th:each="buckets:${allBuckets}">
         <td><a th:href="@{/objects/{uri} (uri=${buckets.uri})}" th:text="${buckets.uri}"></a></td>
-
     </tr>
 </table>
 </div>

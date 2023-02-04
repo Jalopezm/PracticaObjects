@@ -45,27 +45,29 @@ public class ObjectsController {
         m.addAttribute("userName", user.getNickname());
         List<Bucket> bucketList = myService.allBuckets(user);
         m.addAttribute("allBuckets", bucketList);
-        m.addAttribute("message",session.getAttribute("message"));
-        session.setAttribute("message","");
+        m.addAttribute("message", session.getAttribute("message"));
+        session.setAttribute("message", "");
         return "buckets";
     }
 
     @PostMapping("/objects")
     public String objectsPost(@Valid BucketForm bucketForm, Model m) {
-        if (bucketForm.getUri().startsWith("/")){
+        if (bucketForm.getUri().startsWith("/")) {
             bucketForm.setUri(bucketForm.getUri().substring(1));
-            if (bucketForm.getUri().endsWith("/")){
-                bucketForm.setUri(bucketForm.getUri().substring(0,bucketForm.getUri().length()-1));
+            if (bucketForm.getUri().endsWith("/")) {
+                bucketForm.setUri(bucketForm.getUri().substring(0, bucketForm.getUri().length() - 1));
             }
         }
         User user = (User) session.getAttribute("user");
         Bucket bucket = myService.bucketOnDb(bucketForm.getUri());
         if (bucket == null) {
-            bucketForm.setOwner(user.getNickname());
-            myService.newBucket(bucketForm.getUri(), bucketForm.getOwner());
-            session.setAttribute("message","Bucket Created");
-        }else{
-            session.setAttribute("message","Bucket Already Exists");
+            if (!bucketForm.getUri().equals("")) {
+                bucketForm.setOwner(user.getNickname());
+                myService.newBucket(bucketForm.getUri(), bucketForm.getOwner());
+                session.setAttribute("message", "Bucket Created");
+            }
+        } else {
+            session.setAttribute("message", "Bucket Already Exists");
         }
         return "redirect:objects";
     }
@@ -75,24 +77,28 @@ public class ObjectsController {
         User user = (User) session.getAttribute("user");
         m.addAttribute("bucketName", bucketName);
         m.addAttribute("userName", user.getNickname());
+        List<String> objectUris = new ArrayList<>();
         if (!bucketName.equals("")) {
             Bucket bucket = myService.getBucket(bucketName, user.getNickname());
-            session.setAttribute("bucket", bucket);
-            session.setAttribute("bucketName", bucketName);
-            List<Objects> objectsList = myService.allObjects(user, bucket);
-            m.addAttribute("allObjects", objectsList);
-            List<String> objectUris = new ArrayList<>();
-            for (Objects o : objectsList) {
-                String uri = o.getUri().split("/")[1];
-                if (!uri.contains(".")) {
-                    uri = "/" + uri + "/";
-                } else {
-                    uri = "/" + uri;
-                }
-                if (!objectUris.contains(uri)) {
-                    objectUris.add(uri);
-                }
+            if (bucket != null) {
+                session.setAttribute("bucket", bucket);
+                session.setAttribute("bucketName", bucketName);
+                List<Objects> objectsList = myService.allObjects(user, bucket);
+                m.addAttribute("allObjects", objectsList);
 
+                for (Objects o : objectsList) {
+                    String uri = o.getUri().split("/")[1];
+                    if (!uri.contains(".")) {
+                        uri = "/" + uri + "/";
+                    } else {
+                        uri = "/" + uri;
+                    }
+                    if (!objectUris.contains(uri)) {
+                        objectUris.add(uri);
+                    }
+                }
+            }else{
+                return "redirect:/objects";
             }
             m.addAttribute("allUris", objectUris);
         }
@@ -119,13 +125,13 @@ public class ObjectsController {
         File createdFile;
         if (!myService.fileOnDb(hash)) {
             myService.newFile(arrayBytes, arrayBytes.length, hash);
-        }else{
+        } else {
             myService.updateLink(hash);
         }
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
         uri = bucket.getUri() + uri;
-        Objects object = myService.getObject(bucket.getId(),uri);
+        Objects object = myService.getObject(bucket.getId(), uri);
         int version;
         if (object == null) {
             object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
@@ -187,7 +193,7 @@ public class ObjectsController {
             if (!s.startsWith("/")) {
                 s = "/" + s;
             }
-            s = bucket.getUri()+s;
+            s = bucket.getUri() + s;
             Objects o = myService.getObject(bucket.getId(), s);
             List<File> f = myService.getFileFromObjId(bucket, o);
             List<ObjectToFileRef> of = myService.getFileToObject(o.getId());
@@ -198,8 +204,9 @@ public class ObjectsController {
             return "oneobject";
         }
     }
+
     @GetMapping("/download/{objid}/{fid}")
-    public ResponseEntity<byte[]> download(@PathVariable String objid,@PathVariable String fid){
+    public ResponseEntity<byte[]> download(@PathVariable String objid, @PathVariable String fid) {
         File file = myService.getFileFromFileId(Integer.parseInt(fid));
         byte[] content = file.getBody();
         Objects object = myService.getObjectFromObjId(Integer.parseInt(objid));
@@ -207,28 +214,30 @@ public class ObjectsController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentLength(content.length);
         headers.setContentType(MediaType.valueOf(object.getContentType()));
-        headers.set("Content-disposition","attachment ;filename = "+ name);
-        return new ResponseEntity<>(content,headers, HttpStatus.OK);
+        headers.set("Content-disposition", "attachment ;filename = " + name);
+        return new ResponseEntity<>(content, headers, HttpStatus.OK);
     }
+
     @PostMapping("/deleteobj/{object}/**")
-    public String deleteObj(HttpServletRequest req){
+    public String deleteObj(HttpServletRequest req) {
         String object = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         object = object.substring(object.indexOf("/") + 1);
         object = object.substring(object.indexOf("/") + 1);
         System.out.println(object);
         Bucket bucket = (Bucket) session.getAttribute("bucket");
-        myService.deleteObject(object,bucket.getId());
-        return "redirect:"+"/objects";
+        myService.deleteObject(object, bucket.getId());
+        return "redirect:" + "/objects";
     }
+
     @PostMapping("/deletebucket/{bucket}")
-    public String deleteBucket(HttpServletRequest req){
+    public String deleteBucket(HttpServletRequest req) {
         String object = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         object = object.substring(object.indexOf("/") + 1);
         object = object.substring(object.indexOf("/") + 1);
         System.out.println(object);
         User user = (User) session.getAttribute("user");
         Bucket bucket = (Bucket) session.getAttribute("bucket");
-        myService.deleteBucket(user,bucket);
-        return "redirect:"+"/objects";
+        myService.deleteBucket(user, bucket);
+        return "redirect:" + "/objects";
     }
 }
