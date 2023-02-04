@@ -69,8 +69,10 @@ public class AppController {
     @GetMapping("/settings")
     public String settings(Model m) {
         User user = (User) session.getAttribute("user");
-        m.addAttribute("user",user);
-        m.getAttribute("user");
+        if (user!= null) {
+            m.addAttribute("user", user);
+            m.getAttribute("user");
+        }
         return "settings";
     }
     @PostMapping("/settings")
@@ -94,17 +96,17 @@ public class AppController {
     @PostMapping("/settings/{deleteUser}")
     public String deleteUserPost(@Valid UserForm userForm,Model m){
         if (myService.logUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()))){
-            myService.deleteUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()));
-            User user = myService.getUser(userForm.getName());
+            User user = (User) session.getAttribute("user");
             List<Bucket> bucketList = myService.allBuckets(user);
             for (Bucket bucket : bucketList) {
                 myService.deleteBucket(user, bucket);
             }
+            myService.deleteUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()));
             m.addAttribute("message","User Deleted");
         }else{
             m.addAttribute("message", "Unknown User or Password");
         }
-        return "settings";
+        return "redirect:/";
     }
 
 }
