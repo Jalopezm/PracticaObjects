@@ -11,7 +11,6 @@ public class Objects {
     Timestamp lastModified;
     Timestamp created;
     String contentType;
-    //Map<String,String> metaData;
 
     public Objects() {
     }

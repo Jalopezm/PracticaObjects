@@ -3,7 +3,9 @@ package com.esliceu.PracticaObjects.controllers;
 import com.esliceu.PracticaObjects.forms.UserForm;
 import com.esliceu.PracticaObjects.model.Bucket;
 import com.esliceu.PracticaObjects.model.User;
-import com.esliceu.PracticaObjects.service.MyService;
+import com.esliceu.PracticaObjects.service.BucketService;
+import com.esliceu.PracticaObjects.service.ObjectService;
+import com.esliceu.PracticaObjects.service.UserService;
 import com.esliceu.PracticaObjects.utils.EncriptPass;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -19,7 +21,11 @@ import java.util.List;
 @Controller
 public class AppController {
     @Autowired
-    MyService myService;
+    ObjectService objectService;
+    @Autowired
+    BucketService bucketService;
+    @Autowired
+    UserService userService;
     @Autowired
     HttpSession session;
     @Autowired
@@ -37,11 +43,11 @@ public class AppController {
 
     @PostMapping("/signup")
     public String signUpPost(@Valid UserForm userForm, Model m) {
-        if (myService.validateUser(userForm.getNickname())) {
+        if (userService.validateUser(userForm.getNickname())) {
             m.addAttribute("message", "User Already Exists Select Other User Name");
             return "signup";
         } else {
-            myService.newUser(userForm.getName(),userForm.getNickname(),userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()));
+            userService.newUser(userForm.getName(),userForm.getNickname(),userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()));
             m.addAttribute("message", "OK");
         }
         return "index";
@@ -54,8 +60,8 @@ public class AppController {
 
     @PostMapping("/login")
     public String loginPost(@Valid UserForm userForm, Model m) {
-        if (myService.logUser(userForm.getNickname(), encriptPass.encritpPass(userForm.getPassword()))) {
-            User user = myService.getUser(userForm.getNickname());
+        if (userService.logUser(userForm.getNickname(), encriptPass.encritpPass(userForm.getPassword()))) {
+            User user = userService.getUser(userForm.getNickname());
             session.setAttribute("user",user);
             m.addAttribute("message", "OK");
             m.addAttribute("userName", userForm.getNickname());
@@ -80,9 +86,9 @@ public class AppController {
         User user = (User) session.getAttribute("user");
         m.getAttribute("user");
         if (userForm.getPassword().length() < 8){
-            myService.updateUser(userForm.getName(), userForm.getEmail(), user.getPassword(),user.getNickname());
+            userService.updateUser(userForm.getName(), userForm.getEmail(), user.getPassword(),user.getNickname());
         }else {
-            myService.updateUser(userForm.getName(), userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()), userForm.getNickname());
+            userService.updateUser(userForm.getName(), userForm.getEmail(), encriptPass.encritpPass(userForm.getPassword()), userForm.getNickname());
         }
         session.setAttribute("user",user);
         m.addAttribute("user",user);
@@ -95,13 +101,13 @@ public class AppController {
     }
     @PostMapping("/settings/{deleteUser}")
     public String deleteUserPost(@Valid UserForm userForm,Model m){
-        if (myService.logUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()))){
+        if (userService.logUser(userForm.getName(),encriptPass.encritpPass(userForm.getPassword()))){
             User user = (User) session.getAttribute("user");
-            List<Bucket> bucketList = myService.allBuckets(user);
+            List<Bucket> bucketList = bucketService.allBuckets(user);
             for (Bucket bucket : bucketList) {
-                myService.deleteBucket(user, bucket);
+                bucketService.deleteBucket(user, bucket);
             }
-            myService.deleteUser(user.getNickname(),encriptPass.encritpPass(userForm.getPassword()));
+            userService.deleteUser(user.getNickname(),encriptPass.encritpPass(userForm.getPassword()));
             session.setAttribute("user",null);
 
             m.addAttribute("message","User Deleted");

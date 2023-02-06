@@ -3,7 +3,8 @@ package com.esliceu.PracticaObjects.controllers;
 import com.esliceu.PracticaObjects.forms.BucketForm;
 import com.esliceu.PracticaObjects.forms.ObjectForm;
 import com.esliceu.PracticaObjects.model.*;
-import com.esliceu.PracticaObjects.service.MyService;
+import com.esliceu.PracticaObjects.service.BucketService;
+import com.esliceu.PracticaObjects.service.ObjectService;
 import com.esliceu.PracticaObjects.utils.HashCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -33,7 +34,9 @@ import java.util.List;
 @Controller
 public class ObjectsController {
     @Autowired
-    MyService myService;
+    ObjectService objectService;
+    @Autowired
+    BucketService bucketService;
     @Autowired
     HttpSession session;
     @Autowired
@@ -43,7 +46,7 @@ public class ObjectsController {
     public String objects(Model m) {
         User user = (User) session.getAttribute("user");
         m.addAttribute("userName", user.getNickname());
-        List<Bucket> bucketList = myService.allBuckets(user);
+        List<Bucket> bucketList = bucketService.allBuckets(user);
         m.addAttribute("allBuckets", bucketList);
         m.addAttribute("message", session.getAttribute("message"));
         session.setAttribute("message", "");
@@ -59,11 +62,11 @@ public class ObjectsController {
             }
         }
         User user = (User) session.getAttribute("user");
-        Bucket bucket = myService.bucketOnDb(bucketForm.getUri());
+        Bucket bucket = bucketService.bucketOnDb(bucketForm.getUri());
         if (bucket == null) {
             if (!bucketForm.getUri().equals("")) {
                 bucketForm.setOwner(user.getNickname());
-                myService.newBucket(bucketForm.getUri(), bucketForm.getOwner());
+                bucketService.newBucket(bucketForm.getUri(), bucketForm.getOwner());
                 session.setAttribute("message", "Bucket Created");
             }
         } else {
@@ -79,11 +82,11 @@ public class ObjectsController {
         m.addAttribute("userName", user.getNickname());
         List<String> objectUris = new ArrayList<>();
         if (!bucketName.equals("")) {
-            Bucket bucket = myService.getBucket(bucketName, user.getNickname());
+            Bucket bucket = bucketService.getBucket(bucketName, user.getNickname());
             if (bucket != null) {
                 session.setAttribute("bucket", bucket);
                 session.setAttribute("bucketName", bucketName);
-                List<Objects> objectsList = myService.allObjects(user, bucket);
+                List<Objects> objectsList = objectService.allObjects(user, bucket);
                 m.addAttribute("allObjects", objectsList);
 
                 for (Objects o : objectsList) {
@@ -123,24 +126,24 @@ public class ObjectsController {
             throw new RuntimeException(e);
         }
         File createdFile;
-        if (!myService.fileOnDb(hash)) {
-            myService.newFile(arrayBytes, arrayBytes.length, hash);
+        if (!objectService.fileOnDb(hash)) {
+            objectService.newFile(arrayBytes, arrayBytes.length, hash);
         } else {
-            myService.updateLink(hash);
+            objectService.updateLink(hash);
         }
 
         String uri = objectForm.getPath() + file.getOriginalFilename();
         uri = bucket.getUri() + uri;
-        Objects object = myService.getObject(bucket.getId(), uri);
+        Objects object = objectService.getObject(bucket.getId(), uri);
         int version;
         if (object == null) {
-            object = myService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
+            object = objectService.newObject(bucket.getId(), uri, Timestamp.from(Instant.now()), bucket.getOwner(), Timestamp.from(Instant.now()), file.getContentType());
             version = 0;
         }
-        createdFile = myService.getFileFromHash(hash);
-        version = myService.getFileVersion(createdFile, object);
+        createdFile = objectService.getFileFromHash(hash);
+        version = objectService.getFileVersion(createdFile, object);
         createdFile.setVersion(version + 1);
-        myService.refFileToObject(object, createdFile);
+        objectService.refFileToObject(object, createdFile);
         return "redirect:" + bucket.getUri();
     }
 
@@ -160,7 +163,7 @@ public class ObjectsController {
         if (s.endsWith("/")) {
             // directori
             User user = (User) session.getAttribute("user");
-            List<Objects> objectsList = myService.allObjects(user, bucket);
+            List<Objects> objectsList = objectService.allObjects(user, bucket);
             List<Objects> objectsListFinal = new ArrayList<>();
             for (Objects objects : objectsList) {
                 if (objects.getUri().contains(s)) {
@@ -194,9 +197,9 @@ public class ObjectsController {
                 s = "/" + s;
             }
             s = bucket.getUri() + s;
-            Objects o = myService.getObject(bucket.getId(), s);
-            List<File> f = myService.getFileFromObjId(bucket, o);
-            List<ObjectToFileRef> of = myService.getFileToObject(o.getId());
+            Objects o = objectService.getObject(bucket.getId(), s);
+            List<File> f = objectService.getFileFromObjId(bucket, o);
+            List<ObjectToFileRef> of = objectService.getFileToObject(o.getId());
 
             m.addAttribute("fileList", f);
             m.addAttribute("object", o);
@@ -207,9 +210,9 @@ public class ObjectsController {
 
     @GetMapping("/download/{objid}/{fid}")
     public ResponseEntity<byte[]> download(@PathVariable String objid, @PathVariable String fid) {
-        File file = myService.getFileFromFileId(Integer.parseInt(fid));
+        File file = objectService.getFileFromFileId(Integer.parseInt(fid));
         byte[] content = file.getBody();
-        Objects object = myService.getObjectFromObjId(Integer.parseInt(objid));
+        Objects object = objectService.getObjectFromObjId(Integer.parseInt(objid));
         String name = object.getUri();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentLength(content.length);
@@ -225,7 +228,7 @@ public class ObjectsController {
         object = object.substring(object.indexOf("/") + 1);
         System.out.println(object);
         Bucket bucket = (Bucket) session.getAttribute("bucket");
-        myService.deleteObject(object, bucket.getId());
+        objectService.deleteObject(object, bucket.getId());
         return "redirect:" + "/objects";
     }
 
@@ -237,7 +240,7 @@ public class ObjectsController {
         System.out.println(object);
         User user = (User) session.getAttribute("user");
         Bucket bucket = (Bucket) session.getAttribute("bucket");
-        myService.deleteBucket(user, bucket);
+        bucketService.deleteBucket(user, bucket);
         return "redirect:" + "/objects";
     }
 }
