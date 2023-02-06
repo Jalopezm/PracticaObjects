@@ -28,6 +28,10 @@ public class File {
         return hash;
     }
 
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
     public int getId() {
         return id;
     }

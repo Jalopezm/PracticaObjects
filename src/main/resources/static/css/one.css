@@ -10,3 +10,12 @@ table{
 td{
     margin:15px;
 }
+#form{
+    margin-top:10%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+input{
+margin:3%;
+}

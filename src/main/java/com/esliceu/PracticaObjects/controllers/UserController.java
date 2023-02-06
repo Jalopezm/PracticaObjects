@@ -19,9 +19,7 @@ import java.util.List;
 
 
 @Controller
-public class AppController {
-    @Autowired
-    ObjectService objectService;
+public class UserController {
     @Autowired
     BucketService bucketService;
     @Autowired

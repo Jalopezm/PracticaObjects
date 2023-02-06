@@ -34,7 +34,6 @@
         <td th:with="file = ${fileList[i.index]}">
             <p th:text="'Hash:  ' + ${file.hash}"></p>
         </td>
-        <td><p th:text="'Created Date:  ' + ${v.uploadDate}"></p></td>
         <td><p th:text="'Version ID:  ' + ${v.versionId}"></p></td>
         <td><a th:href="@{/download/{objid}/{fid}(objid=${v.idObject},fid=${v.idFile})}">Download</a></td>
     </tr>

@@ -111,7 +111,6 @@ public class ObjectsController {
     @PostMapping("/objects/{bucketName}")
     public String bucketsPost(@Valid ObjectForm objectForm, @RequestParam("file") MultipartFile file, Model m) {
         byte[] arrayBytes;
-
         Bucket bucket = (Bucket) session.getAttribute("bucket");
         m.addAttribute("bucketName", bucket.getUri());
         try {

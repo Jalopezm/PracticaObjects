@@ -15,6 +15,6 @@ public class PracticaObjectsApplication implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new MyAuthInterceptor()).addPathPatterns("/objects/**","/settings");
+        registry.addInterceptor(new MyAuthInterceptor()).addPathPatterns("/objects/**","/settings/**","/download/**","/deleteobj/**","/deletebucket/**");
     }
 }

@@ -68,8 +68,8 @@ public class ObjectDAOImpl implements ObjectDAO {
         List<ObjectToFileRef> list = jdbcTemplate.query("Select * from filetoobject where idObject = ?", new BeanPropertyRowMapper<>(ObjectToFileRef.class), id);
         List<File> fileList = new ArrayList<>();
         for (ObjectToFileRef objectToFileRef : list) {
-            List<File> f = jdbcTemplate.query("Select * from file where id =?", new BeanPropertyRowMapper<>(File.class), objectToFileRef.getIdFile());
-            fileList.add(f.get(0));
+            List<File> file = jdbcTemplate.query("Select * from file where id= ?", new BeanPropertyRowMapper<>(File.class), objectToFileRef.getIdFile());
+            fileList.add(file.get(0));
         }
         return fileList;
     }
